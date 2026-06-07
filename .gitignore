@@ -1,0 +1,32 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment files
+.env
+*.env
+
+# VS Code
+.vscode/
+
+# FastAPI / Python cache
+.pytest_cache/
+.mypy_cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Database / local storage
+*.db
+*.sqlite3
+
+# Optional local data
+backend/data/*.bak

@@ -1,0 +1,32 @@
+[
+    {
+        "ticket_id": "TKT-1001",
+        "user_query": "My laptop screen is broken",
+        "issue_type": "Hardware",
+        "priority": "Low",
+        "status": "Open",
+        "created_at": "2026-06-07 18:19:13",
+        "assigned_team": "IT Hardware Support",
+        "agent": "Ticketing Agent"
+    },
+    {
+        "ticket_id": "TKT-1002",
+        "user_query": "My laptop screen is broken",
+        "issue_type": "Hardware",
+        "priority": "Low",
+        "status": "Open",
+        "created_at": "2026-06-07 18:19:38",
+        "assigned_team": "IT Hardware Support",
+        "agent": "Ticketing Agent"
+    },
+    {
+        "ticket_id": "TKT-1003",
+        "user_query": "Urgent server is down for everyone",
+        "issue_type": "General",
+        "priority": "Critical",
+        "status": "Open",
+        "created_at": "2026-06-07 18:23:15",
+        "assigned_team": "Service Desk Team",
+        "agent": "Ticketing Agent"
+    }
+]
