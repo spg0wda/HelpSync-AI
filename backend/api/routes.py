@@ -9,7 +9,11 @@ from agents.dashboard_agent import (
     get_all_escalations
 )
 from agents.report_agent import generate_service_report, get_all_reports
-
+from agents.feedback_agent import (
+    create_feedback,
+    get_all_feedback,
+    get_feedback_summary
+)
 
 router = APIRouter()
 
@@ -21,6 +25,12 @@ class ChatRequest(BaseModel):
 class ReportRequest(BaseModel):
     conversation_id: str | None = None
 
+class FeedbackRequest(BaseModel):
+    conversation_id: str | None = None
+    helpful: bool
+    rating: int
+    comment: str = ""
+    improvement_suggestion: str = ""
 
 @router.post("/chat")
 def chat(request: ChatRequest):
@@ -123,4 +133,40 @@ def reports():
         "current_stage": "Phase 12 - Final Report Generator",
         "total_reports": len(all_reports),
         "reports": all_reports
+    }
+@router.post("/feedback")
+def submit_feedback(request: FeedbackRequest):
+    """
+    Stores human feedback for a conversation.
+    """
+
+    feedback = create_feedback(
+        conversation_id=request.conversation_id,
+        helpful=request.helpful,
+        rating=request.rating,
+        comment=request.comment,
+        improvement_suggestion=request.improvement_suggestion
+    )
+
+    return {
+        "current_stage": "Phase 13 - Human Feedback and Learning Loop",
+        "message": "Feedback submitted successfully.",
+        "feedback": feedback
+    }
+
+
+@router.get("/feedback")
+def feedback_records():
+    """
+    Returns all feedback records and summary.
+    """
+
+    feedback = get_all_feedback()
+    summary = get_feedback_summary()
+
+    return {
+        "current_stage": "Phase 13 - Human Feedback and Learning Loop",
+        "summary": summary,
+        "total_feedback": len(feedback),
+        "feedback": feedback
     }

@@ -129,6 +129,31 @@ def get_reports():
     return response.json()
 
 
+def submit_feedback(conversation_id, helpful, rating, comment, improvement_suggestion):
+    response = requests.post(
+        f"{BACKEND_URL}/feedback",
+        json={
+            "conversation_id": conversation_id,
+            "helpful": helpful,
+            "rating": rating,
+            "comment": comment,
+            "improvement_suggestion": improvement_suggestion
+        },
+        timeout=30
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+def get_feedback_records():
+    response = requests.get(
+        f"{BACKEND_URL}/feedback",
+        timeout=30
+    )
+    response.raise_for_status()
+    return response.json()
+
+
 with st.sidebar:
     st.header("📌 Project Info")
     st.write("**Project:** HelpSync AI")
@@ -145,12 +170,13 @@ with st.sidebar:
     st.code("Urgent server is down for everyone")
 
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "💬 Chat",
     "📊 Dashboard",
     "🎫 Tickets",
     "🧠 History",
-    "📄 Reports"
+    "📄 Reports",
+    "⭐ Feedback"
 ])
 
 
@@ -447,3 +473,85 @@ with tab5:
                 st.error("Backend is not running. Start the FastAPI backend first.")
             except Exception as error:
                 st.error(f"Something went wrong: {error}")
+
+
+with tab6:
+    st.subheader("⭐ Human Feedback and Learning Loop")
+
+    st.markdown(
+        """
+        <div class="info-box">
+        Submit feedback for a conversation. This helps improve future service desk responses.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.write("")
+
+    conversation_id = st.text_input(
+        "Conversation ID",
+        placeholder="Example: CONV-3008"
+    )
+
+    helpful_option = st.radio(
+        "Was the response helpful?",
+        ["Helpful", "Not Helpful"],
+        horizontal=True
+    )
+
+    helpful = helpful_option == "Helpful"
+
+    rating = st.slider(
+        "Rating",
+        min_value=1,
+        max_value=5,
+        value=5
+    )
+
+    comment = st.text_area(
+        "Comment",
+        placeholder="Example: The ticket routing was correct."
+    )
+
+    improvement_suggestion = st.text_area(
+        "Improvement Suggestion",
+        placeholder="Example: Add more troubleshooting steps before ticket creation."
+    )
+
+    if st.button("Submit Feedback", type="primary", use_container_width=True):
+        try:
+            feedback_response = submit_feedback(
+                conversation_id=conversation_id if conversation_id.strip() else None,
+                helpful=helpful,
+                rating=rating,
+                comment=comment,
+                improvement_suggestion=improvement_suggestion
+            )
+
+            st.success("Feedback submitted successfully.")
+            st.json(feedback_response.get("feedback", {}))
+
+        except requests.exceptions.ConnectionError:
+            st.error("Backend is not running. Start the FastAPI backend first.")
+        except Exception as error:
+            st.error(f"Something went wrong: {error}")
+
+    st.divider()
+
+    st.markdown("### View Feedback Records")
+
+    if st.button("Load Feedback Records", use_container_width=True):
+        try:
+            feedback_records = get_feedback_records()
+
+            st.markdown("#### Feedback Summary")
+            st.json(feedback_records.get("summary", {}))
+
+            st.markdown("#### All Feedback")
+            st.json(feedback_records.get("feedback", []))
+
+        except requests.exceptions.ConnectionError:
+            st.error("Backend is not running. Start the FastAPI backend first.")
+        except Exception as error:
+            st.error(f"Something went wrong: {error}")
