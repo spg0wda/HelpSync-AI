@@ -23,5 +23,42 @@
         "final_response": "Your issue has been classified as Access. Suggested solution: Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
         "created_at": "2026-06-07 19:14:51",
         "agent": "Memory Agent"
+    },
+    {
+        "conversation_id": "CONV-3002",
+        "user_query": "Urgent server is down for everyone",
+        "classification": {
+            "issue_type": "General",
+            "priority": "Critical",
+            "route_to": "Escalation Agent",
+            "agent": "Classifier Agent"
+        },
+        "route_to": "Escalation Agent",
+        "retrieval_result": null,
+        "ticket": {
+            "ticket_id": "TKT-1004",
+            "user_query": "Urgent server is down for everyone",
+            "issue_type": "General",
+            "priority": "Critical",
+            "status": "Open",
+            "created_at": "2026-06-07 19:27:27",
+            "assigned_team": "Service Desk Team",
+            "agent": "Ticketing Agent"
+        },
+        "escalation": {
+            "escalation_id": "ESC-2002",
+            "ticket_id": "TKT-1004",
+            "user_query": "Urgent server is down for everyone",
+            "issue_type": "General",
+            "priority": "Critical",
+            "status": "Escalated",
+            "escalated_to": "Service Desk Manager",
+            "reason": "Service outage or large-scale impact detected.",
+            "created_at": "2026-06-07 19:27:27",
+            "agent": "Escalation Agent"
+        },
+        "final_response": "Your issue has been classified as General with Critical priority. A ticket has been created and escalated successfully. Ticket ID: TKT-1004. Escalation ID: ESC-2002. Escalated To: Service Desk Manager.",
+        "created_at": "2026-06-07 19:27:27",
+        "agent": "Memory Agent"
     }
 ]
