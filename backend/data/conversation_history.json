@@ -260,5 +260,135 @@
         "final_response": "Your issue has been classified as Network with Critical priority. A ticket has been created and escalated successfully. Ticket ID: TKT-1007. Escalation ID: ESC-2004. Escalated To: Senior Network Operations Team.",
         "created_at": "2026-06-07 20:11:39",
         "agent": "Memory Agent"
+    },
+    {
+        "conversation_id": "CONV-3010",
+        "user_query": "My laptop is not connecting to WiFi",
+        "classification": {
+            "issue_type": "Network",
+            "priority": "Low",
+            "route_to": "Retrieval Agent",
+            "agent": "Classifier Agent"
+        },
+        "route_to": "Retrieval Agent",
+        "retrieval_result": {
+            "found": true,
+            "kb_id": "KB-001",
+            "title": "WiFi connection issue",
+            "category": "Network",
+            "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
+            "confidence_score": 4,
+            "agent": "Retrieval Agent"
+        },
+        "ticket": null,
+        "escalation": null,
+        "final_response": "Your issue has been classified as Network. Suggested solution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
+        "created_at": "2026-06-08 00:01:38",
+        "agent": "Memory Agent"
+    },
+    {
+        "conversation_id": "CONV-3011",
+        "user_query": "My laptop is not connecting to WiFi\n",
+        "classification": {
+            "issue_type": "Network",
+            "priority": "Low",
+            "route_to": "Retrieval Agent",
+            "agent": "Classifier Agent"
+        },
+        "route_to": "Retrieval Agent",
+        "retrieval_result": {
+            "found": true,
+            "kb_id": "KB-001",
+            "title": "WiFi connection issue",
+            "category": "Network",
+            "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
+            "confidence_score": 4,
+            "agent": "Retrieval Agent"
+        },
+        "ticket": null,
+        "escalation": null,
+        "final_response": "Your issue has been classified as Network. Suggested solution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
+        "created_at": "2026-06-08 01:02:13",
+        "agent": "Memory Agent"
+    },
+    {
+        "conversation_id": "CONV-3012",
+        "user_query": "My laptop is not connecting to WiFi",
+        "classification": {
+            "issue_type": "Network",
+            "priority": "Low",
+            "route_to": "Retrieval Agent",
+            "agent": "Classifier Agent"
+        },
+        "route_to": "Retrieval Agent",
+        "retrieval_result": {
+            "found": true,
+            "kb_id": "KB-001",
+            "title": "WiFi connection issue",
+            "category": "Network",
+            "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
+            "confidence_score": 4,
+            "agent": "Retrieval Agent"
+        },
+        "ticket": null,
+        "escalation": null,
+        "final_response": "Your issue has been classified as Network. Suggested solution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
+        "created_at": "2026-06-08 01:13:28",
+        "agent": "Memory Agent"
+    },
+    {
+        "conversation_id": "CONV-3013",
+        "user_query": "Payroll salary is not received",
+        "classification": {
+            "issue_type": "HR",
+            "priority": "Low",
+            "route_to": "Retrieval Agent",
+            "agent": "Classifier Agent"
+        },
+        "route_to": "Retrieval Agent",
+        "retrieval_result": {
+            "found": true,
+            "kb_id": "KB-005",
+            "title": "Payroll or salary issue",
+            "category": "HR",
+            "solution": "Check the HR portal for payroll status. If the issue continues, contact the HR operations team.",
+            "confidence_score": 4,
+            "agent": "Retrieval Agent"
+        },
+        "ticket": null,
+        "escalation": null,
+        "final_response": "Your issue has been classified as HR. Suggested solution: Check the HR portal for payroll status. If the issue continues, contact the HR operations team.",
+        "created_at": "2026-06-08 01:14:13",
+        "agent": "Memory Agent"
+    },
+    {
+        "conversation_id": "CONV-3014",
+        "user_query": "hi hello",
+        "classification": {
+            "issue_type": "General",
+            "priority": "Low",
+            "route_to": "Retrieval Agent",
+            "agent": "Classifier Agent"
+        },
+        "route_to": "Retrieval Agent",
+        "retrieval_result": {
+            "found": false,
+            "message": "No strong matching solution found in the knowledge base.",
+            "agent": "Retrieval Agent"
+        },
+        "ticket": {
+            "ticket_id": "TKT-1008",
+            "user_query": "hi hello",
+            "issue_type": "General",
+            "priority": "Low",
+            "status": "Open",
+            "created_at": "2026-06-08 01:17:30",
+            "assigned_team": "Service Desk Team",
+            "agent": "Ticketing Agent"
+        },
+        "escalation": null,
+        "final_response": "Your issue has been classified as General with Low priority. A support ticket has been created. Ticket ID: TKT-1008. Assigned Team: Service Desk Team.",
+        "created_at": "2026-06-08 01:17:30",
+        "agent": "Memory Agent"
     }
 ]
