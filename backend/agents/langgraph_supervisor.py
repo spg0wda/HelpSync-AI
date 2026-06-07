@@ -7,12 +7,10 @@ from agents.retrieval_agent import retrieve_solution
 from agents.ticketing_agent import create_ticket
 from agents.escalation_agent import escalate_issue
 from agents.memory_agent import save_conversation
+from agents.llm_response_agent import polish_final_response
+
 
 class ServiceDeskState(TypedDict, total=False):
-    """
-    Shared state passed between LangGraph agent nodes.
-    """
-
     user_query: str
     route_to: str
 
@@ -24,6 +22,7 @@ class ServiceDeskState(TypedDict, total=False):
     workflow_trace: list[dict[str, Any]]
     final_response: str
     memory_record: dict[str, Any]
+    llm_response: dict[str, Any]
 
 
 def add_trace(
@@ -33,10 +32,6 @@ def add_trace(
     action: str,
     output: dict[str, Any] | None
 ) -> list[dict[str, Any]]:
-    """
-    Adds one step to the workflow trace.
-    """
-
     existing_trace = state.get("workflow_trace", [])
 
     return existing_trace + [
@@ -50,11 +45,6 @@ def add_trace(
 
 
 def classifier_node(state: ServiceDeskState) -> ServiceDeskState:
-    """
-    LangGraph node 1:
-    Runs Classifier Agent.
-    """
-
     user_query = state["user_query"]
 
     classification = classify_issue(user_query)
@@ -73,11 +63,6 @@ def classifier_node(state: ServiceDeskState) -> ServiceDeskState:
 
 
 def retrieval_node(state: ServiceDeskState) -> ServiceDeskState:
-    """
-    LangGraph node 2:
-    Runs Retrieval Agent.
-    """
-
     retrieval_result = retrieve_solution(
         user_query=state["user_query"],
         issue_type=state["classification"]["issue_type"]
@@ -96,11 +81,6 @@ def retrieval_node(state: ServiceDeskState) -> ServiceDeskState:
 
 
 def ticketing_node(state: ServiceDeskState) -> ServiceDeskState:
-    """
-    LangGraph node 3:
-    Runs Ticketing Agent.
-    """
-
     ticket = create_ticket(
         user_query=state["user_query"],
         issue_type=state["classification"]["issue_type"],
@@ -122,11 +102,6 @@ def ticketing_node(state: ServiceDeskState) -> ServiceDeskState:
 
 
 def escalation_node(state: ServiceDeskState) -> ServiceDeskState:
-    """
-    LangGraph node 4:
-    Runs Escalation Agent.
-    """
-
     ticket = state.get("ticket")
 
     escalation = escalate_issue(
@@ -151,23 +126,28 @@ def escalation_node(state: ServiceDeskState) -> ServiceDeskState:
 
 
 def final_response_node(state: ServiceDeskState) -> ServiceDeskState:
-    """
-    LangGraph final node:
-    Builds final response after collecting all agent outputs.
-    Saves the interaction into conversation memory.
-    """
-
     classification = state.get("classification")
     retrieval_result = state.get("retrieval_result")
     ticket = state.get("ticket")
     escalation = state.get("escalation")
 
-    final_response = build_final_response(
+    base_final_response = build_final_response(
         classification=classification,
         retrieval_result=retrieval_result,
         ticket=ticket,
         escalation=escalation
     )
+
+    llm_response = polish_final_response(
+        user_query=state["user_query"],
+        classification=classification,
+        retrieval_result=retrieval_result,
+        ticket=ticket,
+        escalation=escalation,
+        base_response=base_final_response
+    )
+
+    final_response = llm_response.get("response", base_final_response)
 
     memory_record = save_conversation(
         user_query=state["user_query"],
@@ -183,14 +163,17 @@ def final_response_node(state: ServiceDeskState) -> ServiceDeskState:
 
     return {
         "final_response": final_response,
+        "llm_response": llm_response,
         "memory_record": memory_record,
         "workflow_trace": add_trace(
             state=state,
             step=step_number,
-            agent="Supervisor Agent",
-            action="Prepared final response and saved conversation memory",
+            agent="LLM Response Agent + Supervisor Agent",
+            action="Polished final response using Groq API if available and saved conversation memory",
             output={
+                "base_final_response": base_final_response,
                 "final_response": final_response,
+                "llm_response": llm_response,
                 "conversation_id": memory_record["conversation_id"]
             }
         )
@@ -198,27 +181,15 @@ def final_response_node(state: ServiceDeskState) -> ServiceDeskState:
 
 
 def route_after_classification(state: ServiceDeskState) -> str:
-    """
-    Conditional edge:
-    Decides where to go after classification.
-    """
-
     route_to = state["route_to"]
 
     if route_to == "Retrieval Agent":
         return "retrieval"
 
-    # Both Ticketing Agent and Escalation Agent first create a ticket.
     return "ticketing"
 
 
 def route_after_retrieval(state: ServiceDeskState) -> str:
-    """
-    Conditional edge:
-    If retrieval found a solution, finish.
-    If not, create a ticket.
-    """
-
     retrieval_result = state.get("retrieval_result")
 
     if retrieval_result and retrieval_result.get("found") is True:
@@ -228,12 +199,6 @@ def route_after_retrieval(state: ServiceDeskState) -> str:
 
 
 def route_after_ticketing(state: ServiceDeskState) -> str:
-    """
-    Conditional edge:
-    If original classifier route was escalation, escalate after ticket creation.
-    Otherwise, finish.
-    """
-
     if state.get("route_to") == "Escalation Agent":
         return "escalation"
 
@@ -241,51 +206,47 @@ def route_after_ticketing(state: ServiceDeskState) -> str:
 
 
 def build_final_response(
-    classification: dict[str, Any],
+    classification: dict[str, Any] | None,
     retrieval_result: dict[str, Any] | None,
     ticket: dict[str, Any] | None,
     escalation: dict[str, Any] | None
 ) -> str:
-    """
-    Builds final user-facing response.
-    """
+    if not classification:
+        return "Unable to classify the issue. Please provide more details."
+
+    issue_type = classification.get("issue_type", "General")
+    priority = classification.get("priority", "Medium")
 
     if escalation:
         return (
-            f"Your issue has been classified as {classification['issue_type']} "
-            f"with {classification['priority']} priority. "
-            f"A ticket has been created and escalated successfully. "
-            f"Ticket ID: {ticket['ticket_id']}. "
-            f"Escalation ID: {escalation['escalation_id']}. "
-            f"Escalated To: {escalation['escalated_to']}."
+            f"Your issue has been classified as {issue_type} with {priority} priority. "
+            f"A support ticket has been created and escalated successfully. "
+            f"Ticket ID: {ticket['ticket_id'] if ticket else 'N/A'}. "
+            f"Escalation ID: {escalation.get('escalation_id')}. "
+            f"Escalated To: {escalation.get('escalated_to')}."
         )
 
     if ticket:
         return (
-            f"Your issue has been classified as {classification['issue_type']} "
-            f"with {classification['priority']} priority. "
+            f"Your issue has been classified as {issue_type} with {priority} priority. "
             f"A support ticket has been created. "
-            f"Ticket ID: {ticket['ticket_id']}. "
-            f"Assigned Team: {ticket['assigned_team']}."
+            f"Ticket ID: {ticket.get('ticket_id')}. "
+            f"Assigned Team: {ticket.get('assigned_team')}."
         )
 
     if retrieval_result and retrieval_result.get("found"):
         return (
-            f"Your issue has been classified as {classification['issue_type']}. "
-            f"Suggested solution: {retrieval_result['solution']}"
+            f"Your issue has been classified as {issue_type}. "
+            f"Suggested solution: {retrieval_result.get('solution')}"
         )
 
     return (
-        f"Your issue has been classified as {classification['issue_type']} "
-        f"with {classification['priority']} priority."
+        f"Your issue has been classified as {issue_type} with {priority} priority. "
+        f"No strong knowledge base solution was found, so manual support may be required."
     )
 
 
 def build_service_desk_graph():
-    """
-    Builds and compiles the LangGraph workflow.
-    """
-
     workflow = StateGraph(ServiceDeskState)
 
     workflow.add_node("classifier", classifier_node)
@@ -332,14 +293,7 @@ def build_service_desk_graph():
 service_desk_graph = build_service_desk_graph()
 
 
-service_desk_graph = build_service_desk_graph()
-
-
 def run_langgraph_workflow(user_query: str) -> dict:
-    """
-    Runs the compiled LangGraph workflow.
-    """
-
     initial_state: ServiceDeskState = {
         "user_query": user_query,
         "workflow_trace": []
@@ -359,6 +313,7 @@ def run_langgraph_workflow(user_query: str) -> dict:
         "ticket": result.get("ticket"),
         "escalation": result.get("escalation"),
         "memory_record": result.get("memory_record"),
+        "llm_response": result.get("llm_response"),
         "workflow_trace": result.get("workflow_trace"),
         "final_response": result.get("final_response")
     }

@@ -14,6 +14,7 @@ from agents.feedback_agent import (
     get_all_feedback,
     get_feedback_summary
 )
+from data.chroma_store import seed_knowledge_base, reset_knowledge_base
 
 router = APIRouter()
 
@@ -169,4 +170,22 @@ def feedback_records():
         "summary": summary,
         "total_feedback": len(feedback),
         "feedback": feedback
+    }
+@router.post("/vector/seed")
+def seed_vector_database():
+    result = seed_knowledge_base()
+
+    return {
+        "current_stage": "Phase 15 - ChromaDB Vector Retrieval",
+        "result": result
+    }
+
+
+@router.post("/vector/reset")
+def reset_vector_database():
+    result = reset_knowledge_base()
+
+    return {
+        "current_stage": "Phase 15 - ChromaDB Vector Retrieval",
+        "result": result
     }

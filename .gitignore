@@ -30,3 +30,7 @@ Thumbs.db
 
 # Optional local data
 backend/data/*.bak
+
+backend/data/chroma_db/
+.env
+*.env
