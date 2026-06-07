@@ -1,0 +1,60 @@
+[
+    {
+        "report_id": "RPT-4001",
+        "conversation_id": "CONV-3008",
+        "generated_at": "2026-06-07 19:58:11",
+        "agent": "Report Agent",
+        "generated": true,
+        "case_summary": {
+            "user_query": "Urgent server is down for everyone",
+            "issue_type": "General",
+            "priority": "Critical",
+            "route_to": "Escalation Agent",
+            "final_response": "Your issue has been classified as General with Critical priority. A ticket has been created and escalated successfully. Ticket ID: TKT-1006. Escalation ID: ESC-2003. Escalated To: Service Desk Manager."
+        },
+        "resolution_summary": "The issue was escalated to Service Desk Manager with escalation ID ESC-2003.",
+        "architecture_flow": [
+            "User Interface",
+            "FastAPI Backend",
+            "LangGraph Supervisor",
+            "Classifier Agent",
+            "Ticketing Agent",
+            "Escalation Agent",
+            "Memory Agent",
+            "Report Agent"
+        ],
+        "risk_analysis": "This is a critical General issue. It may affect business continuity, productivity, or service availability.",
+        "security_considerations": "Critical incidents should be reviewed for possible security impact, especially if they involve outage, breach, or unauthorized access.",
+        "scalability_considerations": "For repeated General issues, the knowledge base should be expanded. Routing through Escalation Agent can be optimized by adding more rules, LLM classification, or vector-based retrieval in the future.",
+        "final_recommendation": "Monitor this issue until closure, notify the responsible team, and review root cause after resolution."
+    },
+    {
+        "report_id": "RPT-4002",
+        "conversation_id": "CONV-3008",
+        "generated_at": "2026-06-07 19:58:57",
+        "agent": "Report Agent",
+        "generated": true,
+        "case_summary": {
+            "user_query": "Urgent server is down for everyone",
+            "issue_type": "General",
+            "priority": "Critical",
+            "route_to": "Escalation Agent",
+            "final_response": "Your issue has been classified as General with Critical priority. A ticket has been created and escalated successfully. Ticket ID: TKT-1006. Escalation ID: ESC-2003. Escalated To: Service Desk Manager."
+        },
+        "resolution_summary": "The issue was escalated to Service Desk Manager with escalation ID ESC-2003.",
+        "architecture_flow": [
+            "User Interface",
+            "FastAPI Backend",
+            "LangGraph Supervisor",
+            "Classifier Agent",
+            "Ticketing Agent",
+            "Escalation Agent",
+            "Memory Agent",
+            "Report Agent"
+        ],
+        "risk_analysis": "This is a critical General issue. It may affect business continuity, productivity, or service availability.",
+        "security_considerations": "Critical incidents should be reviewed for possible security impact, especially if they involve outage, breach, or unauthorized access.",
+        "scalability_considerations": "For repeated General issues, the knowledge base should be expanded. Routing through Escalation Agent can be optimized by adding more rules, LLM classification, or vector-based retrieval in the future.",
+        "final_recommendation": "Monitor this issue until closure, notify the responsible team, and review root cause after resolution."
+    }
+]

@@ -28,14 +28,6 @@ st.markdown(
         margin-bottom: 25px;
     }
 
-    .metric-card {
-        background-color: #f8fafc;
-        padding: 18px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        text-align: center;
-    }
-
     .success-box {
         background-color: #ecfdf5;
         color: #065f46;
@@ -83,25 +75,56 @@ def call_chat_api(user_query: str):
 
 
 def get_dashboard_stats():
-    response = requests.get(f"{BACKEND_URL}/dashboard/stats", timeout=30)
+    response = requests.get(
+        f"{BACKEND_URL}/dashboard/stats",
+        timeout=30
+    )
     response.raise_for_status()
     return response.json()
 
 
 def get_history():
-    response = requests.get(f"{BACKEND_URL}/history", timeout=30)
+    response = requests.get(
+        f"{BACKEND_URL}/history",
+        timeout=30
+    )
     response.raise_for_status()
     return response.json()
 
 
 def get_tickets():
-    response = requests.get(f"{BACKEND_URL}/dashboard/tickets", timeout=30)
+    response = requests.get(
+        f"{BACKEND_URL}/dashboard/tickets",
+        timeout=30
+    )
     response.raise_for_status()
     return response.json()
 
 
 def get_escalations():
-    response = requests.get(f"{BACKEND_URL}/dashboard/escalations", timeout=30)
+    response = requests.get(
+        f"{BACKEND_URL}/dashboard/escalations",
+        timeout=30
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+def generate_report(conversation_id=None):
+    response = requests.post(
+        f"{BACKEND_URL}/reports/generate",
+        json={"conversation_id": conversation_id},
+        timeout=30
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+def get_reports():
+    response = requests.get(
+        f"{BACKEND_URL}/reports",
+        timeout=30
+    )
     response.raise_for_status()
     return response.json()
 
@@ -122,11 +145,12 @@ with st.sidebar:
     st.code("Urgent server is down for everyone")
 
 
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "💬 Chat",
     "📊 Dashboard",
     "🎫 Tickets",
-    "🧠 History"
+    "🧠 History",
+    "📄 Reports"
 ])
 
 
@@ -282,11 +306,14 @@ with tab3:
 
     with col1:
         st.markdown("### Support Tickets")
+
         if st.button("Load Tickets", use_container_width=True):
             try:
                 ticket_response = get_tickets()
+
                 st.metric("Total Tickets", ticket_response.get("total_tickets", 0))
                 st.json(ticket_response.get("tickets", []))
+
             except requests.exceptions.ConnectionError:
                 st.error("Backend is not running. Start the FastAPI backend first.")
             except Exception as error:
@@ -294,11 +321,14 @@ with tab3:
 
     with col2:
         st.markdown("### Escalation Records")
+
         if st.button("Load Escalations", use_container_width=True):
             try:
                 escalation_response = get_escalations()
+
                 st.metric("Total Escalations", escalation_response.get("total_escalations", 0))
                 st.json(escalation_response.get("escalations", []))
+
             except requests.exceptions.ConnectionError:
                 st.error("Backend is not running. Start the FastAPI backend first.")
             except Exception as error:
@@ -322,9 +352,98 @@ with tab4:
     if st.button("Load Recent History", type="primary", use_container_width=True):
         try:
             history_response = get_history()
+
             st.metric("Total Returned", history_response.get("total_returned", 0))
             st.json(history_response.get("conversations", []))
+
         except requests.exceptions.ConnectionError:
             st.error("Backend is not running. Start the FastAPI backend first.")
         except Exception as error:
             st.error(f"Something went wrong: {error}")
+
+
+with tab5:
+    st.subheader("📄 Final Service Desk Reports")
+
+    st.markdown(
+        """
+        <div class="info-box">
+        Generate final case reports from conversation memory.
+        Reports include case summary, architecture flow, risks, security notes,
+        scalability notes, and final recommendations.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.write("")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("### Generate Latest Report")
+
+        if st.button("Generate Report for Latest Conversation", type="primary", use_container_width=True):
+            try:
+                report_response = generate_report()
+                report = report_response.get("report", {})
+
+                if report.get("generated") is False:
+                    st.warning(report.get("message", "Report could not be generated."))
+                else:
+                    st.success("Report generated successfully.")
+
+                    st.markdown("#### Case Summary")
+                    st.json(report.get("case_summary", {}))
+
+                    st.markdown("#### Resolution Summary")
+                    st.info(report.get("resolution_summary", "No resolution summary."))
+
+                    st.markdown("#### Architecture Flow")
+                    st.json(report.get("architecture_flow", []))
+
+                    st.markdown("#### Risk Analysis")
+                    st.warning(report.get("risk_analysis", "No risk analysis."))
+
+                    st.markdown("#### Security Considerations")
+                    st.info(report.get("security_considerations", "No security notes."))
+
+                    st.markdown("#### Scalability Considerations")
+                    st.info(report.get("scalability_considerations", "No scalability notes."))
+
+                    st.markdown("#### Final Recommendation")
+                    st.success(report.get("final_recommendation", "No recommendation."))
+
+                    with st.expander("View Full Report JSON"):
+                        st.json(report)
+
+            except requests.exceptions.ConnectionError:
+                st.error("Backend is not running. Start the FastAPI backend first.")
+            except Exception as error:
+                st.error(f"Something went wrong: {error}")
+
+    with col2:
+        st.markdown("### View All Reports")
+
+        if st.button("Load Reports", use_container_width=True):
+            try:
+                reports_response = get_reports()
+
+                st.metric("Total Reports", reports_response.get("total_reports", 0))
+                reports = reports_response.get("reports", [])
+
+                if not reports:
+                    st.info("No reports generated yet.")
+                else:
+                    for report in reports:
+                        with st.expander(
+                            f"{report.get('report_id')} - {report.get('conversation_id')}"
+                        ):
+                            st.write("Generated At:", report.get("generated_at"))
+                            st.write("Agent:", report.get("agent"))
+                            st.json(report)
+
+            except requests.exceptions.ConnectionError:
+                st.error("Backend is not running. Start the FastAPI backend first.")
+            except Exception as error:
+                st.error(f"Something went wrong: {error}")

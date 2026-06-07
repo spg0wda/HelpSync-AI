@@ -11,7 +11,7 @@ def classify_issue(user_query: str) -> dict:
     route_to = "Retrieval Agent"
 
     # Network / IT issues
-    if any(word in query for word in ["wifi", "internet", "network", "vpn", "connection"]):
+    if any(word in query for word in ["wifi", "internet", "network", "vpn", "connection", "server", "outage"]):
         issue_type = "Network"
         route_to = "Retrieval Agent"
 
