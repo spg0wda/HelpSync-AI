@@ -1,0 +1,27 @@
+[
+    {
+        "conversation_id": "CONV-3001",
+        "user_query": "I forgot my password and cannot login",
+        "classification": {
+            "issue_type": "Access",
+            "priority": "Low",
+            "route_to": "Retrieval Agent",
+            "agent": "Classifier Agent"
+        },
+        "route_to": "Retrieval Agent",
+        "retrieval_result": {
+            "found": true,
+            "kb_id": "KB-002",
+            "title": "Password reset issue",
+            "category": "Access",
+            "solution": "Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
+            "confidence_score": 5,
+            "agent": "Retrieval Agent"
+        },
+        "ticket": null,
+        "escalation": null,
+        "final_response": "Your issue has been classified as Access. Suggested solution: Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
+        "created_at": "2026-06-07 19:14:51",
+        "agent": "Memory Agent"
+    }
+]

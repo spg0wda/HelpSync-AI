@@ -6,7 +6,7 @@ from agents.classifier_agent import classify_issue
 from agents.retrieval_agent import retrieve_solution
 from agents.ticketing_agent import create_ticket
 from agents.escalation_agent import escalate_issue
-
+from agents.memory_agent import save_conversation
 
 class ServiceDeskState(TypedDict, total=False):
     """
@@ -23,6 +23,7 @@ class ServiceDeskState(TypedDict, total=False):
 
     workflow_trace: list[dict[str, Any]]
     final_response: str
+    memory_record: dict[str, Any]
 
 
 def add_trace(
@@ -153,6 +154,7 @@ def final_response_node(state: ServiceDeskState) -> ServiceDeskState:
     """
     LangGraph final node:
     Builds final response after collecting all agent outputs.
+    Saves the interaction into conversation memory.
     """
 
     classification = state.get("classification")
@@ -167,16 +169,30 @@ def final_response_node(state: ServiceDeskState) -> ServiceDeskState:
         escalation=escalation
     )
 
+    memory_record = save_conversation(
+        user_query=state["user_query"],
+        classification=classification,
+        route_to=state.get("route_to"),
+        retrieval_result=retrieval_result,
+        ticket=ticket,
+        escalation=escalation,
+        final_response=final_response
+    )
+
     step_number = len(state.get("workflow_trace", [])) + 1
 
     return {
         "final_response": final_response,
+        "memory_record": memory_record,
         "workflow_trace": add_trace(
             state=state,
             step=step_number,
             agent="Supervisor Agent",
-            action="Prepared final response for user",
-            output={"final_response": final_response}
+            action="Prepared final response and saved conversation memory",
+            output={
+                "final_response": final_response,
+                "conversation_id": memory_record["conversation_id"]
+            }
         )
     }
 
@@ -316,6 +332,9 @@ def build_service_desk_graph():
 service_desk_graph = build_service_desk_graph()
 
 
+service_desk_graph = build_service_desk_graph()
+
+
 def run_langgraph_workflow(user_query: str) -> dict:
     """
     Runs the compiled LangGraph workflow.
@@ -339,6 +358,7 @@ def run_langgraph_workflow(user_query: str) -> dict:
         "retrieval_result": result.get("retrieval_result"),
         "ticket": result.get("ticket"),
         "escalation": result.get("escalation"),
+        "memory_record": result.get("memory_record"),
         "workflow_trace": result.get("workflow_trace"),
         "final_response": result.get("final_response")
     }
