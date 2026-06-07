@@ -1,13 +1,1 @@
-[
-    {
-        "feedback_id": "FDB-5001",
-        "conversation_id": "CONV-3008",
-        "helpful": true,
-        "rating": 5,
-        "comment": "The response was accurate.",
-        "improvement_suggestion": "Add more detailed troubleshooting steps.",
-        "learning_note": "Response was useful. Similar workflow can be reused for future similar issues.",
-        "created_at": "2026-06-07 20:18:23",
-        "agent": "Feedback Agent"
-    }
-]
+[]

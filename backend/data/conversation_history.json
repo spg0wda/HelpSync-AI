@@ -1,69 +1,7 @@
 [
     {
         "conversation_id": "CONV-3001",
-        "user_query": "I forgot my password and cannot login",
-        "classification": {
-            "issue_type": "Access",
-            "priority": "Low",
-            "route_to": "Retrieval Agent",
-            "agent": "Classifier Agent"
-        },
-        "route_to": "Retrieval Agent",
-        "retrieval_result": {
-            "found": true,
-            "kb_id": "KB-002",
-            "title": "Password reset issue",
-            "category": "Access",
-            "solution": "Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
-            "confidence_score": 5,
-            "agent": "Retrieval Agent"
-        },
-        "ticket": null,
-        "escalation": null,
-        "final_response": "Your issue has been classified as Access. Suggested solution: Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
-        "created_at": "2026-06-07 19:14:51",
-        "agent": "Memory Agent"
-    },
-    {
-        "conversation_id": "CONV-3002",
-        "user_query": "Urgent server is down for everyone",
-        "classification": {
-            "issue_type": "General",
-            "priority": "Critical",
-            "route_to": "Escalation Agent",
-            "agent": "Classifier Agent"
-        },
-        "route_to": "Escalation Agent",
-        "retrieval_result": null,
-        "ticket": {
-            "ticket_id": "TKT-1004",
-            "user_query": "Urgent server is down for everyone",
-            "issue_type": "General",
-            "priority": "Critical",
-            "status": "Open",
-            "created_at": "2026-06-07 19:27:27",
-            "assigned_team": "Service Desk Team",
-            "agent": "Ticketing Agent"
-        },
-        "escalation": {
-            "escalation_id": "ESC-2002",
-            "ticket_id": "TKT-1004",
-            "user_query": "Urgent server is down for everyone",
-            "issue_type": "General",
-            "priority": "Critical",
-            "status": "Escalated",
-            "escalated_to": "Service Desk Manager",
-            "reason": "Service outage or large-scale impact detected.",
-            "created_at": "2026-06-07 19:27:27",
-            "agent": "Escalation Agent"
-        },
-        "final_response": "Your issue has been classified as General with Critical priority. A ticket has been created and escalated successfully. Ticket ID: TKT-1004. Escalation ID: ESC-2002. Escalated To: Service Desk Manager.",
-        "created_at": "2026-06-07 19:27:27",
-        "agent": "Memory Agent"
-    },
-    {
-        "conversation_id": "CONV-3003",
-        "user_query": "My laptop is not connecting to WiFi\n",
+        "user_query": "My laptop is not connecting to WiFi",
         "classification": {
             "issue_type": "Network",
             "priority": "Low",
@@ -77,17 +15,54 @@
             "title": "WiFi connection issue",
             "category": "Network",
             "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-            "confidence_score": 4,
-            "agent": "Retrieval Agent"
+            "confidence_score": 0.522,
+            "distance": 0.9162386655807495,
+            "top_matches": [
+                {
+                    "kb_id": "KB-001",
+                    "title": "WiFi connection issue",
+                    "category": "Network",
+                    "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
+                    "keywords": "wifi, internet, network, connection, not connecting",
+                    "distance": 0.9162386655807495,
+                    "confidence_score": 0.522,
+                    "document": "Category: Network\nTitle: WiFi connection issue\nKeywords: wifi, internet, network, connection, not connecting\nSolution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
+                    "id": "KB-001"
+                },
+                {
+                    "kb_id": "KB-004",
+                    "title": "Laptop hardware issue",
+                    "category": "Hardware",
+                    "solution": "Check physical connections, restart the device, update drivers, and raise a hardware support ticket if unresolved.",
+                    "keywords": "laptop, keyboard, mouse, screen, battery, printer",
+                    "distance": 1.3155673742294312,
+                    "confidence_score": 0.432,
+                    "document": "Category: Hardware\nTitle: Laptop hardware issue\nKeywords: laptop, keyboard, mouse, screen, battery, printer\nSolution: Check physical connections, restart the device, update drivers, and raise a hardware support ticket if unresolved.",
+                    "id": "KB-004"
+                },
+                {
+                    "kb_id": "KB-002",
+                    "title": "Password reset issue",
+                    "category": "Access",
+                    "solution": "Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
+                    "keywords": "password, login, account, reset, forgot",
+                    "distance": 1.5634474754333496,
+                    "confidence_score": 0.39,
+                    "document": "Category: Access\nTitle: Password reset issue\nKeywords: password, login, account, reset, forgot\nSolution: Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
+                    "id": "KB-002"
+                }
+            ],
+            "retrieval_type": "ChromaDB Vector Search",
+            "agent": "Vector Retrieval Agent"
         },
         "ticket": null,
         "escalation": null,
-        "final_response": "Your issue has been classified as Network. Suggested solution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-        "created_at": "2026-06-07 19:39:49",
+        "final_response": "Your issue has been classified as a Network issue. \n\nTo resolve the issue, please try restarting your router, reconnecting to WiFi, forgetting and re-adding the network, and ensuring that airplane mode is turned off. If the issue persists, please contact IT support for further assistance.",
+        "created_at": "2026-06-08 02:58:41",
         "agent": "Memory Agent"
     },
     {
-        "conversation_id": "CONV-3004",
+        "conversation_id": "CONV-3002",
         "user_query": "I forgot my password and cannot login",
         "classification": {
             "issue_type": "Access",
@@ -102,17 +77,54 @@
             "title": "Password reset issue",
             "category": "Access",
             "solution": "Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
-            "confidence_score": 5,
-            "agent": "Retrieval Agent"
+            "confidence_score": 0.637,
+            "distance": 0.5704324841499329,
+            "top_matches": [
+                {
+                    "kb_id": "KB-002",
+                    "title": "Password reset issue",
+                    "category": "Access",
+                    "solution": "Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
+                    "keywords": "password, login, account, reset, forgot",
+                    "distance": 0.5704324841499329,
+                    "confidence_score": 0.637,
+                    "document": "Category: Access\nTitle: Password reset issue\nKeywords: password, login, account, reset, forgot\nSolution: Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
+                    "id": "KB-002"
+                },
+                {
+                    "kb_id": "KB-006",
+                    "title": "VPN access issue",
+                    "category": "Access",
+                    "solution": "Check your internet connection, restart the VPN client, verify credentials, and ensure MFA approval is completed.",
+                    "keywords": "vpn, access, remote, connection",
+                    "distance": 1.5622401237487793,
+                    "confidence_score": 0.39,
+                    "document": "Category: Access\nTitle: VPN access issue\nKeywords: vpn, access, remote, connection\nSolution: Check your internet connection, restart the VPN client, verify credentials, and ensure MFA approval is completed.",
+                    "id": "KB-006"
+                },
+                {
+                    "kb_id": "KB-004",
+                    "title": "Laptop hardware issue",
+                    "category": "Hardware",
+                    "solution": "Check physical connections, restart the device, update drivers, and raise a hardware support ticket if unresolved.",
+                    "keywords": "laptop, keyboard, mouse, screen, battery, printer",
+                    "distance": 1.798121690750122,
+                    "confidence_score": 0.357,
+                    "document": "Category: Hardware\nTitle: Laptop hardware issue\nKeywords: laptop, keyboard, mouse, screen, battery, printer\nSolution: Check physical connections, restart the device, update drivers, and raise a hardware support ticket if unresolved.",
+                    "id": "KB-004"
+                }
+            ],
+            "retrieval_type": "ChromaDB Vector Search",
+            "agent": "Vector Retrieval Agent"
         },
         "ticket": null,
         "escalation": null,
-        "final_response": "Your issue has been classified as Access. Suggested solution: Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
-        "created_at": "2026-06-07 19:40:51",
+        "final_response": "**Password Reset Issue**\n\nYour issue has been classified as an access issue. To resolve the problem, please use the password reset portal. If your account is locked, you can try waiting 15 minutes or contact IT support for further assistance.",
+        "created_at": "2026-06-08 02:59:37",
         "agent": "Memory Agent"
     },
     {
-        "conversation_id": "CONV-3005",
+        "conversation_id": "CONV-3003",
         "user_query": "My laptop screen is broken",
         "classification": {
             "issue_type": "Hardware",
@@ -123,111 +135,24 @@
         "route_to": "Ticketing Agent",
         "retrieval_result": null,
         "ticket": {
-            "ticket_id": "TKT-1005",
+            "ticket_id": "TKT-1001",
             "user_query": "My laptop screen is broken",
             "issue_type": "Hardware",
             "priority": "Low",
             "status": "Open",
-            "created_at": "2026-06-07 19:41:46",
+            "created_at": "2026-06-08 03:00:19",
             "assigned_team": "IT Hardware Support",
             "agent": "Ticketing Agent"
         },
         "escalation": null,
-        "final_response": "Your issue has been classified as Hardware with Low priority. A support ticket has been created. Ticket ID: TKT-1005. Assigned Team: IT Hardware Support.",
-        "created_at": "2026-06-07 19:41:46",
+        "final_response": "Your issue has been classified as a Hardware problem with Low priority. A support ticket (TKT-1001) has been created and assigned to our IT Hardware Support team. We will review your case and provide a solution as soon as possible.",
+        "created_at": "2026-06-08 03:00:20",
         "agent": "Memory Agent"
     },
     {
-        "conversation_id": "CONV-3006",
-        "user_query": "My laptop is not connecting to WiFi",
-        "classification": {
-            "issue_type": "Network",
-            "priority": "Low",
-            "route_to": "Retrieval Agent",
-            "agent": "Classifier Agent"
-        },
-        "route_to": "Retrieval Agent",
-        "retrieval_result": {
-            "found": true,
-            "kb_id": "KB-001",
-            "title": "WiFi connection issue",
-            "category": "Network",
-            "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-            "confidence_score": 4,
-            "agent": "Retrieval Agent"
-        },
-        "ticket": null,
-        "escalation": null,
-        "final_response": "Your issue has been classified as Network. Suggested solution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-        "created_at": "2026-06-07 19:45:40",
-        "agent": "Memory Agent"
-    },
-    {
-        "conversation_id": "CONV-3007",
-        "user_query": "I forgot my password and cannot login",
-        "classification": {
-            "issue_type": "Access",
-            "priority": "Low",
-            "route_to": "Retrieval Agent",
-            "agent": "Classifier Agent"
-        },
-        "route_to": "Retrieval Agent",
-        "retrieval_result": {
-            "found": true,
-            "kb_id": "KB-002",
-            "title": "Password reset issue",
-            "category": "Access",
-            "solution": "Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
-            "confidence_score": 5,
-            "agent": "Retrieval Agent"
-        },
-        "ticket": null,
-        "escalation": null,
-        "final_response": "Your issue has been classified as Access. Suggested solution: Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
-        "created_at": "2026-06-07 19:45:57",
-        "agent": "Memory Agent"
-    },
-    {
-        "conversation_id": "CONV-3008",
+        "conversation_id": "CONV-3004",
         "user_query": "Urgent server is down for everyone",
         "classification": {
-            "issue_type": "General",
-            "priority": "Critical",
-            "route_to": "Escalation Agent",
-            "agent": "Classifier Agent"
-        },
-        "route_to": "Escalation Agent",
-        "retrieval_result": null,
-        "ticket": {
-            "ticket_id": "TKT-1006",
-            "user_query": "Urgent server is down for everyone",
-            "issue_type": "General",
-            "priority": "Critical",
-            "status": "Open",
-            "created_at": "2026-06-07 19:57:24",
-            "assigned_team": "Service Desk Team",
-            "agent": "Ticketing Agent"
-        },
-        "escalation": {
-            "escalation_id": "ESC-2003",
-            "ticket_id": "TKT-1006",
-            "user_query": "Urgent server is down for everyone",
-            "issue_type": "General",
-            "priority": "Critical",
-            "status": "Escalated",
-            "escalated_to": "Service Desk Manager",
-            "reason": "Service outage or large-scale impact detected.",
-            "created_at": "2026-06-07 19:57:24",
-            "agent": "Escalation Agent"
-        },
-        "final_response": "Your issue has been classified as General with Critical priority. A ticket has been created and escalated successfully. Ticket ID: TKT-1006. Escalation ID: ESC-2003. Escalated To: Service Desk Manager.",
-        "created_at": "2026-06-07 19:57:24",
-        "agent": "Memory Agent"
-    },
-    {
-        "conversation_id": "CONV-3009",
-        "user_query": " Urgent server is down for everyone",
-        "classification": {
             "issue_type": "Network",
             "priority": "Critical",
             "route_to": "Escalation Agent",
@@ -236,108 +161,33 @@
         "route_to": "Escalation Agent",
         "retrieval_result": null,
         "ticket": {
-            "ticket_id": "TKT-1007",
-            "user_query": " Urgent server is down for everyone",
+            "ticket_id": "TKT-1002",
+            "user_query": "Urgent server is down for everyone",
             "issue_type": "Network",
             "priority": "Critical",
             "status": "Open",
-            "created_at": "2026-06-07 20:11:39",
+            "created_at": "2026-06-08 03:00:54",
             "assigned_team": "IT Network Support",
             "agent": "Ticketing Agent"
         },
         "escalation": {
-            "escalation_id": "ESC-2004",
-            "ticket_id": "TKT-1007",
-            "user_query": " Urgent server is down for everyone",
+            "escalation_id": "ESC-2001",
+            "ticket_id": "TKT-1002",
+            "user_query": "Urgent server is down for everyone",
             "issue_type": "Network",
             "priority": "Critical",
             "status": "Escalated",
             "escalated_to": "Senior Network Operations Team",
             "reason": "Service outage or large-scale impact detected.",
-            "created_at": "2026-06-07 20:11:39",
+            "created_at": "2026-06-08 03:00:54",
             "agent": "Escalation Agent"
         },
-        "final_response": "Your issue has been classified as Network with Critical priority. A ticket has been created and escalated successfully. Ticket ID: TKT-1007. Escalation ID: ESC-2004. Escalated To: Senior Network Operations Team.",
-        "created_at": "2026-06-07 20:11:39",
+        "final_response": "Your issue has been classified as a Network issue with Critical priority. A support ticket (TKT-1002) has been created and escalated to the Senior Network Operations Team. An escalation ID (ESC-2001) has been assigned to track the issue.",
+        "created_at": "2026-06-08 03:00:55",
         "agent": "Memory Agent"
     },
     {
-        "conversation_id": "CONV-3010",
-        "user_query": "My laptop is not connecting to WiFi",
-        "classification": {
-            "issue_type": "Network",
-            "priority": "Low",
-            "route_to": "Retrieval Agent",
-            "agent": "Classifier Agent"
-        },
-        "route_to": "Retrieval Agent",
-        "retrieval_result": {
-            "found": true,
-            "kb_id": "KB-001",
-            "title": "WiFi connection issue",
-            "category": "Network",
-            "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-            "confidence_score": 4,
-            "agent": "Retrieval Agent"
-        },
-        "ticket": null,
-        "escalation": null,
-        "final_response": "Your issue has been classified as Network. Suggested solution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-        "created_at": "2026-06-08 00:01:38",
-        "agent": "Memory Agent"
-    },
-    {
-        "conversation_id": "CONV-3011",
-        "user_query": "My laptop is not connecting to WiFi\n",
-        "classification": {
-            "issue_type": "Network",
-            "priority": "Low",
-            "route_to": "Retrieval Agent",
-            "agent": "Classifier Agent"
-        },
-        "route_to": "Retrieval Agent",
-        "retrieval_result": {
-            "found": true,
-            "kb_id": "KB-001",
-            "title": "WiFi connection issue",
-            "category": "Network",
-            "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-            "confidence_score": 4,
-            "agent": "Retrieval Agent"
-        },
-        "ticket": null,
-        "escalation": null,
-        "final_response": "Your issue has been classified as Network. Suggested solution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-        "created_at": "2026-06-08 01:02:13",
-        "agent": "Memory Agent"
-    },
-    {
-        "conversation_id": "CONV-3012",
-        "user_query": "My laptop is not connecting to WiFi",
-        "classification": {
-            "issue_type": "Network",
-            "priority": "Low",
-            "route_to": "Retrieval Agent",
-            "agent": "Classifier Agent"
-        },
-        "route_to": "Retrieval Agent",
-        "retrieval_result": {
-            "found": true,
-            "kb_id": "KB-001",
-            "title": "WiFi connection issue",
-            "category": "Network",
-            "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-            "confidence_score": 4,
-            "agent": "Retrieval Agent"
-        },
-        "ticket": null,
-        "escalation": null,
-        "final_response": "Your issue has been classified as Network. Suggested solution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-        "created_at": "2026-06-08 01:13:28",
-        "agent": "Memory Agent"
-    },
-    {
-        "conversation_id": "CONV-3013",
+        "conversation_id": "CONV-3005",
         "user_query": "Payroll salary is not received",
         "classification": {
             "issue_type": "HR",
@@ -352,74 +202,19 @@
             "title": "Payroll or salary issue",
             "category": "HR",
             "solution": "Check the HR portal for payroll status. If the issue continues, contact the HR operations team.",
-            "confidence_score": 4,
-            "agent": "Retrieval Agent"
-        },
-        "ticket": null,
-        "escalation": null,
-        "final_response": "Your issue has been classified as HR. Suggested solution: Check the HR portal for payroll status. If the issue continues, contact the HR operations team.",
-        "created_at": "2026-06-08 01:14:13",
-        "agent": "Memory Agent"
-    },
-    {
-        "conversation_id": "CONV-3014",
-        "user_query": "hi hello",
-        "classification": {
-            "issue_type": "General",
-            "priority": "Low",
-            "route_to": "Retrieval Agent",
-            "agent": "Classifier Agent"
-        },
-        "route_to": "Retrieval Agent",
-        "retrieval_result": {
-            "found": false,
-            "message": "No strong matching solution found in the knowledge base.",
-            "agent": "Retrieval Agent"
-        },
-        "ticket": {
-            "ticket_id": "TKT-1008",
-            "user_query": "hi hello",
-            "issue_type": "General",
-            "priority": "Low",
-            "status": "Open",
-            "created_at": "2026-06-08 01:17:30",
-            "assigned_team": "Service Desk Team",
-            "agent": "Ticketing Agent"
-        },
-        "escalation": null,
-        "final_response": "Your issue has been classified as General with Low priority. A support ticket has been created. Ticket ID: TKT-1008. Assigned Team: Service Desk Team.",
-        "created_at": "2026-06-08 01:17:30",
-        "agent": "Memory Agent"
-    },
-    {
-        "conversation_id": "CONV-3015",
-        "user_query": "I cannot connect to office wireless network",
-        "classification": {
-            "issue_type": "Network",
-            "priority": "Low",
-            "route_to": "Retrieval Agent",
-            "agent": "Classifier Agent"
-        },
-        "route_to": "Retrieval Agent",
-        "retrieval_result": {
-            "found": true,
-            "kb_id": "KB-001",
-            "title": "WiFi connection issue",
-            "category": "Network",
-            "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-            "confidence_score": 0.47,
-            "distance": 1.1273261308670044,
+            "confidence_score": 0.52,
+            "distance": 0.9222672581672668,
             "top_matches": [
                 {
-                    "kb_id": "KB-001",
-                    "title": "WiFi connection issue",
-                    "category": "Network",
-                    "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-                    "keywords": "wifi, internet, network, connection, not connecting",
-                    "distance": 1.1273261308670044,
-                    "confidence_score": 0.47,
-                    "document": "Category: Network\nTitle: WiFi connection issue\nKeywords: wifi, internet, network, connection, not connecting\nSolution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-                    "id": "KB-001"
+                    "kb_id": "KB-005",
+                    "title": "Payroll or salary issue",
+                    "category": "HR",
+                    "solution": "Check the HR portal for payroll status. If the issue continues, contact the HR operations team.",
+                    "keywords": "salary, payroll, leave, attendance, employee, hr",
+                    "distance": 0.9222672581672668,
+                    "confidence_score": 0.52,
+                    "document": "Category: HR\nTitle: Payroll or salary issue\nKeywords: salary, payroll, leave, attendance, employee, hr\nSolution: Check the HR portal for payroll status. If the issue continues, contact the HR operations team.",
+                    "id": "KB-005"
                 },
                 {
                     "kb_id": "KB-006",
@@ -427,21 +222,21 @@
                     "category": "Access",
                     "solution": "Check your internet connection, restart the VPN client, verify credentials, and ensure MFA approval is completed.",
                     "keywords": "vpn, access, remote, connection",
-                    "distance": 1.3203651905059814,
-                    "confidence_score": 0.431,
+                    "distance": 1.5474356412887573,
+                    "confidence_score": 0.393,
                     "document": "Category: Access\nTitle: VPN access issue\nKeywords: vpn, access, remote, connection\nSolution: Check your internet connection, restart the VPN client, verify credentials, and ensure MFA approval is completed.",
                     "id": "KB-006"
                 },
                 {
-                    "kb_id": "KB-002",
-                    "title": "Password reset issue",
-                    "category": "Access",
-                    "solution": "Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
-                    "keywords": "password, login, account, reset, forgot",
-                    "distance": 1.57439386844635,
-                    "confidence_score": 0.388,
-                    "document": "Category: Access\nTitle: Password reset issue\nKeywords: password, login, account, reset, forgot\nSolution: Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
-                    "id": "KB-002"
+                    "kb_id": "KB-004",
+                    "title": "Laptop hardware issue",
+                    "category": "Hardware",
+                    "solution": "Check physical connections, restart the device, update drivers, and raise a hardware support ticket if unresolved.",
+                    "keywords": "laptop, keyboard, mouse, screen, battery, printer",
+                    "distance": 1.6602771282196045,
+                    "confidence_score": 0.376,
+                    "document": "Category: Hardware\nTitle: Laptop hardware issue\nKeywords: laptop, keyboard, mouse, screen, battery, printer\nSolution: Check physical connections, restart the device, update drivers, and raise a hardware support ticket if unresolved.",
+                    "id": "KB-004"
                 }
             ],
             "retrieval_type": "ChromaDB Vector Search",
@@ -449,132 +244,8 @@
         },
         "ticket": null,
         "escalation": null,
-        "final_response": "Your issue has been classified as Network. Suggested solution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-        "created_at": "2026-06-08 01:54:23",
-        "agent": "Memory Agent"
-    },
-    {
-        "conversation_id": "CONV-3016",
-        "user_query": "I cannot connect to office wireless network",
-        "classification": {
-            "issue_type": "Network",
-            "priority": "Low",
-            "route_to": "Retrieval Agent",
-            "agent": "Classifier Agent"
-        },
-        "route_to": "Retrieval Agent",
-        "retrieval_result": {
-            "found": true,
-            "kb_id": "KB-001",
-            "title": "WiFi connection issue",
-            "category": "Network",
-            "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-            "confidence_score": 0.47,
-            "distance": 1.1273261308670044,
-            "top_matches": [
-                {
-                    "kb_id": "KB-001",
-                    "title": "WiFi connection issue",
-                    "category": "Network",
-                    "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-                    "keywords": "wifi, internet, network, connection, not connecting",
-                    "distance": 1.1273261308670044,
-                    "confidence_score": 0.47,
-                    "document": "Category: Network\nTitle: WiFi connection issue\nKeywords: wifi, internet, network, connection, not connecting\nSolution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-                    "id": "KB-001"
-                },
-                {
-                    "kb_id": "KB-006",
-                    "title": "VPN access issue",
-                    "category": "Access",
-                    "solution": "Check your internet connection, restart the VPN client, verify credentials, and ensure MFA approval is completed.",
-                    "keywords": "vpn, access, remote, connection",
-                    "distance": 1.3203651905059814,
-                    "confidence_score": 0.431,
-                    "document": "Category: Access\nTitle: VPN access issue\nKeywords: vpn, access, remote, connection\nSolution: Check your internet connection, restart the VPN client, verify credentials, and ensure MFA approval is completed.",
-                    "id": "KB-006"
-                },
-                {
-                    "kb_id": "KB-002",
-                    "title": "Password reset issue",
-                    "category": "Access",
-                    "solution": "Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
-                    "keywords": "password, login, account, reset, forgot",
-                    "distance": 1.57439386844635,
-                    "confidence_score": 0.388,
-                    "document": "Category: Access\nTitle: Password reset issue\nKeywords: password, login, account, reset, forgot\nSolution: Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
-                    "id": "KB-002"
-                }
-            ],
-            "retrieval_type": "ChromaDB Vector Search",
-            "agent": "Vector Retrieval Agent"
-        },
-        "ticket": null,
-        "escalation": null,
-        "final_response": "Your issue has been classified as Network. Suggested solution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-        "created_at": "2026-06-08 02:26:00",
-        "agent": "Memory Agent"
-    },
-    {
-        "conversation_id": "CONV-3017",
-        "user_query": "I cannot connect to office wireless network",
-        "classification": {
-            "issue_type": "Network",
-            "priority": "Low",
-            "route_to": "Retrieval Agent",
-            "agent": "Classifier Agent"
-        },
-        "route_to": "Retrieval Agent",
-        "retrieval_result": {
-            "found": true,
-            "kb_id": "KB-001",
-            "title": "WiFi connection issue",
-            "category": "Network",
-            "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-            "confidence_score": 0.47,
-            "distance": 1.1273261308670044,
-            "top_matches": [
-                {
-                    "kb_id": "KB-001",
-                    "title": "WiFi connection issue",
-                    "category": "Network",
-                    "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-                    "keywords": "wifi, internet, network, connection, not connecting",
-                    "distance": 1.1273261308670044,
-                    "confidence_score": 0.47,
-                    "document": "Category: Network\nTitle: WiFi connection issue\nKeywords: wifi, internet, network, connection, not connecting\nSolution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
-                    "id": "KB-001"
-                },
-                {
-                    "kb_id": "KB-006",
-                    "title": "VPN access issue",
-                    "category": "Access",
-                    "solution": "Check your internet connection, restart the VPN client, verify credentials, and ensure MFA approval is completed.",
-                    "keywords": "vpn, access, remote, connection",
-                    "distance": 1.3203651905059814,
-                    "confidence_score": 0.431,
-                    "document": "Category: Access\nTitle: VPN access issue\nKeywords: vpn, access, remote, connection\nSolution: Check your internet connection, restart the VPN client, verify credentials, and ensure MFA approval is completed.",
-                    "id": "KB-006"
-                },
-                {
-                    "kb_id": "KB-002",
-                    "title": "Password reset issue",
-                    "category": "Access",
-                    "solution": "Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
-                    "keywords": "password, login, account, reset, forgot",
-                    "distance": 1.57439386844635,
-                    "confidence_score": 0.388,
-                    "document": "Category: Access\nTitle: Password reset issue\nKeywords: password, login, account, reset, forgot\nSolution: Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
-                    "id": "KB-002"
-                }
-            ],
-            "retrieval_type": "ChromaDB Vector Search",
-            "agent": "Vector Retrieval Agent"
-        },
-        "ticket": null,
-        "escalation": null,
-        "final_response": "Your issue has been classified as a Network issue. \n\nTo resolve the issue, please try restarting your router, reconnecting to the office wireless network, forgetting and re-adding the network, and ensuring that airplane mode is turned off. If the issue persists, please contact IT support for further assistance.",
-        "created_at": "2026-06-08 02:31:40",
+        "final_response": "Your issue has been classified as HR. To resolve the issue, please check the HR portal for payroll status. If the issue persists, contact the HR operations team for further assistance.",
+        "created_at": "2026-06-08 03:01:16",
         "agent": "Memory Agent"
     }
 ]
