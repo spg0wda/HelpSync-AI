@@ -285,15 +285,15 @@ if not st.session_state.user:
 
     st.stop()
 
-
-tab_chat, tab_dashboard, tab_tickets, tab_history, tab_reports, tab_feedback = st.tabs(
+tab_chat, tab_dashboard, tab_tickets, tab_history, tab_reports, tab_feedback, tab_learning = st.tabs(
     [
         "💬 Chat",
         "📊 Dashboard",
         "🎫 Tickets",
         "🕘 History",
         "📄 Reports",
-        "⭐ Feedback"
+        "⭐ Feedback",
+        "🧠 Learning Loop"
     ]
 )
 
@@ -559,3 +559,107 @@ with tab_feedback:
         st.json(all_feedback)
     else:
         st.error(all_feedback.get("detail", "Could not load feedback."))
+with tab_learning:
+    st.markdown("### 🧠 Autonomous Learning Loop")
+
+    status, summary_data = api_get("/learning/summary", auth=True)
+
+    if status == 200:
+        summary = summary_data.get("summary", {})
+
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            st.metric("Total Notes", summary.get("total_learning_notes", 0))
+
+        with col2:
+            st.metric("Pending Notes", summary.get("pending_notes", 0))
+
+        with col3:
+            st.metric("Applied Notes", summary.get("applied_notes", 0))
+
+        with col4:
+            st.metric("High Priority", summary.get("high_priority_notes", 0))
+
+        render_json_card("Learning Summary", summary)
+
+    else:
+        st.error(summary_data.get("detail", "Could not load learning summary."))
+
+    st.divider()
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if st.button("Generate Learning Notes", use_container_width=True):
+            status, result = api_post("/learning/generate", {}, auth=True)
+
+            if status == 200:
+                st.success("Learning notes generated.")
+                st.json(result)
+            else:
+                st.error(result.get("detail", "Learning note generation failed."))
+
+    with col2:
+        if st.button("Run Autonomous Learning Loop", use_container_width=True):
+            status, result = api_post("/learning/run", {}, auth=True)
+
+            if status == 200:
+                st.success("Autonomous learning loop completed.")
+                st.json(result)
+            else:
+                st.error(result.get("detail", "Autonomous learning loop failed."))
+
+    st.divider()
+
+    st.markdown("### ⏳ Pending Learning Notes")
+
+    status, pending_data = api_get("/learning/pending", auth=True)
+
+    if status == 200:
+        pending_notes = pending_data.get("pending_notes", [])
+
+        if pending_notes:
+            for note in pending_notes:
+                note_id = note.get("note_id")
+
+                with st.expander(f"{note_id} - {note.get('priority')} Priority"):
+                    st.json(note)
+
+                    if st.button(f"Apply {note_id}", key=f"apply_{note_id}", use_container_width=True):
+                        status, apply_result = api_post(
+                            "/learning/apply",
+                            {"note_id": note_id},
+                            auth=True
+                        )
+
+                        if status == 200:
+                            st.success("Learning note applied.")
+                            st.json(apply_result)
+                            st.rerun()
+                        else:
+                            st.error(apply_result.get("detail", "Apply failed."))
+        else:
+            st.info("No pending learning notes found.")
+
+    else:
+        st.error(pending_data.get("detail", "Could not load pending learning notes."))
+
+    st.divider()
+
+    st.markdown("### ✅ Applied Learning Notes")
+
+    status, applied_data = api_get("/learning/applied", auth=True)
+
+    if status == 200:
+        applied_notes = applied_data.get("applied_notes", [])
+
+        if applied_notes:
+            for note in applied_notes:
+                with st.expander(f"{note.get('note_id')} - Applied"):
+                    st.json(note)
+        else:
+            st.info("No applied learning notes yet.")
+
+    else:
+        st.error(applied_data.get("detail", "Could not load applied learning notes."))
