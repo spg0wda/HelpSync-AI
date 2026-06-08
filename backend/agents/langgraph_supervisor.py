@@ -1,6 +1,9 @@
+import os
 from typing import TypedDict, Any
 
+from dotenv import load_dotenv
 from langgraph.graph import StateGraph, START, END
+from langsmith import traceable
 
 from agents.classifier_agent import classify_issue
 from agents.retrieval_agent import retrieve_solution
@@ -8,6 +11,9 @@ from agents.ticketing_agent import create_ticket
 from agents.escalation_agent import escalate_issue
 from agents.memory_agent import save_conversation
 from agents.llm_response_agent import polish_final_response
+
+
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
 
 
 class ServiceDeskState(TypedDict, total=False):
@@ -44,6 +50,7 @@ def add_trace(
     ]
 
 
+@traceable(name="Classifier Agent Node", run_type="chain")
 def classifier_node(state: ServiceDeskState) -> ServiceDeskState:
     user_query = state["user_query"]
 
@@ -62,6 +69,7 @@ def classifier_node(state: ServiceDeskState) -> ServiceDeskState:
     }
 
 
+@traceable(name="Retrieval Agent Node", run_type="retriever")
 def retrieval_node(state: ServiceDeskState) -> ServiceDeskState:
     retrieval_result = retrieve_solution(
         user_query=state["user_query"],
@@ -80,6 +88,7 @@ def retrieval_node(state: ServiceDeskState) -> ServiceDeskState:
     }
 
 
+@traceable(name="Ticketing Agent Node", run_type="tool")
 def ticketing_node(state: ServiceDeskState) -> ServiceDeskState:
     ticket = create_ticket(
         user_query=state["user_query"],
@@ -101,6 +110,7 @@ def ticketing_node(state: ServiceDeskState) -> ServiceDeskState:
     }
 
 
+@traceable(name="Escalation Agent Node", run_type="tool")
 def escalation_node(state: ServiceDeskState) -> ServiceDeskState:
     ticket = state.get("ticket")
 
@@ -125,6 +135,7 @@ def escalation_node(state: ServiceDeskState) -> ServiceDeskState:
     }
 
 
+@traceable(name="Final Response and Memory Node", run_type="chain")
 def final_response_node(state: ServiceDeskState) -> ServiceDeskState:
     classification = state.get("classification")
     retrieval_result = state.get("retrieval_result")
@@ -293,6 +304,7 @@ def build_service_desk_graph():
 service_desk_graph = build_service_desk_graph()
 
 
+@traceable(name="HelpSync AI LangGraph Workflow", run_type="chain")
 def run_langgraph_workflow(user_query: str) -> dict:
     initial_state: ServiceDeskState = {
         "user_query": user_query,
@@ -306,7 +318,8 @@ def run_langgraph_workflow(user_query: str) -> dict:
         "supervisor": {
             "agent": "LangGraph Supervisor",
             "decision": result.get("route_to"),
-            "status": "Completed graph workflow successfully"
+            "status": "Completed graph workflow successfully",
+            "monitoring": "LangSmith enabled if LANGSMITH_TRACING=true"
         },
         "classification": result.get("classification"),
         "retrieval_result": result.get("retrieval_result"),
