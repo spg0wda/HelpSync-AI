@@ -13,7 +13,8 @@ from agents.report_agent import generate_service_report, get_all_reports
 from agents.feedback_agent import (
     create_feedback,
     get_all_feedback,
-    get_feedback_summary
+    get_feedback_summary,
+    get_learning_insights
 )
 from agents.auth_agent import (
     register_user,
@@ -75,7 +76,7 @@ def auth_register(request: RegisterRequest):
         )
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         **result
     }
 
@@ -94,9 +95,11 @@ def auth_login(request: LoginRequest):
         )
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         **result
     }
+
+
 @router.post("/auth/token")
 def auth_token(form_data: OAuth2PasswordRequestForm = Depends()):
     result = login_user(
@@ -115,10 +118,11 @@ def auth_token(form_data: OAuth2PasswordRequestForm = Depends()):
         "token_type": "bearer"
     }
 
+
 @router.get("/auth/me")
 def auth_me(current_user: dict = Depends(get_current_active_user)):
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "user": current_user
     }
 
@@ -128,7 +132,7 @@ def chat(request: ChatRequest):
     result = run_langgraph_workflow(request.user_query)
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         **result
     }
 
@@ -141,7 +145,7 @@ def secure_chat(
     result = run_langgraph_workflow(request.user_query)
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "authenticated_user": current_user,
         **result
     }
@@ -152,7 +156,7 @@ def history():
     conversations = get_recent_conversations(limit=10)
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "total_returned": len(conversations),
         "conversations": conversations
     }
@@ -163,7 +167,7 @@ def dashboard_stats():
     stats = get_dashboard_stats()
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "dashboard": stats
     }
 
@@ -173,7 +177,7 @@ def dashboard_tickets():
     tickets = get_all_tickets()
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "total_tickets": len(tickets),
         "tickets": tickets
     }
@@ -184,7 +188,7 @@ def dashboard_escalations():
     escalations = get_all_escalations()
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "total_escalations": len(escalations),
         "escalations": escalations
     }
@@ -195,7 +199,7 @@ def generate_report(request: ReportRequest):
     report = generate_service_report(request.conversation_id)
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "report": report
     }
 
@@ -205,7 +209,7 @@ def reports():
     all_reports = get_all_reports()
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "total_reports": len(all_reports),
         "reports": all_reports
     }
@@ -222,7 +226,7 @@ def submit_feedback(request: FeedbackRequest):
     )
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "message": "Feedback submitted successfully.",
         "feedback": feedback
     }
@@ -234,10 +238,20 @@ def feedback_records():
     summary = get_feedback_summary()
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "summary": summary,
         "total_feedback": len(feedback),
         "feedback": feedback
+    }
+
+
+@router.get("/feedback/insights")
+def feedback_insights():
+    insights = get_learning_insights()
+
+    return {
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
+        "insights": insights
     }
 
 
@@ -246,7 +260,7 @@ def seed_vector_database():
     result = seed_knowledge_base()
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "result": result
     }
 
@@ -256,7 +270,7 @@ def reset_vector_database():
     result = reset_knowledge_base()
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "result": result
     }
 
@@ -266,7 +280,7 @@ def postgres_init():
     result = init_postgres_tables()
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "result": result
     }
 
@@ -276,7 +290,7 @@ def postgres_status():
     result = get_postgres_status()
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "result": result
     }
 
@@ -286,7 +300,7 @@ def postgres_conversations():
     conversations = get_recent_postgres_conversations(limit=10)
 
     return {
-        "current_stage": "Phase 19 - JWT Authentication",
+        "current_stage": "Phase 20 - Human Feedback Dashboard",
         "total_returned": len(conversations),
         "conversations": conversations
     }
