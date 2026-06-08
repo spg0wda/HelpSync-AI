@@ -7,6 +7,12 @@ HelpSync AI is an AI-powered enterprise service desk assistant that uses a multi
 The system is built using **FastAPI, LangGraph, ChromaDB, Groq API, LangSmith, PostgreSQL, JWT Authentication, Streamlit, and Docker**.
 
 ---
+## 🌐 Live Demo
+
+* 🚀 Frontend App: `https://helpsync-ai-frontend.onrender.com`
+* 🔌 Backend API: `https://helpsync-ai-backend.onrender.com`
+* 📘 Swagger Docs: `https://helpsync-ai-backend.onrender.com/docs`
+* 🐙 GitHub Repository: `https://github.com/spg0wda/HelpSync-AI`
 
 ## 📌 Project Overview
 
