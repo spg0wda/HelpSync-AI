@@ -10,3 +10,5 @@ groq
 langsmith
 sqlalchemy
 psycopg[binary]
+pyjwt
+pwdlib[argon2]

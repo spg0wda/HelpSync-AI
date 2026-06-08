@@ -3,7 +3,16 @@ from datetime import datetime
 from typing import Any
 
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, JSON
+from sqlalchemy import (
+    create_engine,
+    Column,
+    Integer,
+    String,
+    Text,
+    DateTime,
+    JSON,
+    Boolean
+)
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 
@@ -31,6 +40,19 @@ class ConversationRecord(Base):
     escalation = Column(JSON)
     final_response = Column(Text)
     raw_record = Column(JSON)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class UserAccount(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(100), unique=True, index=True, nullable=False)
+    email = Column(String(255), unique=True, index=True, nullable=True)
+    full_name = Column(String(255), nullable=True)
+    hashed_password = Column(Text, nullable=False)
+    role = Column(String(50), default="user")
+    is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -195,12 +217,14 @@ def get_postgres_status() -> dict:
 
         try:
             total_conversations = db.query(ConversationRecord).count()
+            total_users = db.query(UserAccount).count()
 
             return {
                 "enabled": True,
                 "connected": True,
                 "message": "PostgreSQL connected successfully.",
-                "total_conversations": total_conversations
+                "total_conversations": total_conversations,
+                "total_users": total_users
             }
 
         finally:
@@ -212,3 +236,143 @@ def get_postgres_status() -> dict:
             "connected": False,
             "message": f"PostgreSQL connection failed: {str(error)}"
         }
+
+
+def create_user_account(
+    username: str,
+    email: str | None,
+    full_name: str | None,
+    hashed_password: str,
+    role: str = "user"
+) -> dict:
+    init_postgres_tables()
+
+    session_factory = get_session_factory()
+    db = session_factory()
+
+    try:
+        existing_username = (
+            db.query(UserAccount)
+            .filter(UserAccount.username == username)
+            .first()
+        )
+
+        if existing_username:
+            return {
+                "created": False,
+                "message": "Username already exists."
+            }
+
+        if email:
+            existing_email = (
+                db.query(UserAccount)
+                .filter(UserAccount.email == email)
+                .first()
+            )
+
+            if existing_email:
+                return {
+                    "created": False,
+                    "message": "Email already exists."
+                }
+
+        user = UserAccount(
+            username=username,
+            email=email,
+            full_name=full_name,
+            hashed_password=hashed_password,
+            role=role,
+            is_active=True
+        )
+
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+        return {
+            "created": True,
+            "message": "User registered successfully.",
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "full_name": user.full_name,
+                "role": user.role,
+                "is_active": user.is_active,
+                "created_at": user.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            }
+        }
+
+    except Exception as error:
+        db.rollback()
+
+        return {
+            "created": False,
+            "message": f"User creation failed: {str(error)}"
+        }
+
+    finally:
+        db.close()
+
+
+def get_user_account_by_username(username: str) -> dict | None:
+    if not is_postgres_enabled():
+        return None
+
+    init_postgres_tables()
+
+    session_factory = get_session_factory()
+    db = session_factory()
+
+    try:
+        user = (
+            db.query(UserAccount)
+            .filter(UserAccount.username == username)
+            .first()
+        )
+
+        if not user:
+            return None
+
+        return {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "full_name": user.full_name,
+            "hashed_password": user.hashed_password,
+            "role": user.role,
+            "is_active": user.is_active,
+            "created_at": user.created_at.strftime("%Y-%m-%d %H:%M:%S") if user.created_at else None
+        }
+
+    finally:
+        db.close()
+
+
+def get_all_user_accounts() -> list:
+    if not is_postgres_enabled():
+        return []
+
+    init_postgres_tables()
+
+    session_factory = get_session_factory()
+    db = session_factory()
+
+    try:
+        users = db.query(UserAccount).order_by(UserAccount.id.desc()).all()
+
+        return [
+            {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "full_name": user.full_name,
+                "role": user.role,
+                "is_active": user.is_active,
+                "created_at": user.created_at.strftime("%Y-%m-%d %H:%M:%S") if user.created_at else None
+            }
+            for user in users
+        ]
+
+    finally:
+        db.close()

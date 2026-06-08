@@ -433,5 +433,67 @@
         "final_response": "Dear User,\n\nThank you for reaching out to our IT service desk. Your issue has been classified as a Network issue. Based on our knowledge base, we suggest the following solution to resolve your WiFi connection issue:\n\n1. Restart your router.\n2. Reconnect to the office wireless network.\n3. Forget and re-add the network.\n4. Ensure that airplane mode is turned off.\n\nPlease attempt these steps and let us know if the issue persists. We are here to assist you further if needed.\n\nBest regards,\nHelpSync AI",
         "created_at": "2026-06-08 19:49:53",
         "agent": "Memory Agent"
+    },
+    {
+        "conversation_id": "CONV-3009",
+        "user_query": "I cannot connect to office wireless network",
+        "classification": {
+            "issue_type": "Network",
+            "priority": "Low",
+            "route_to": "Retrieval Agent",
+            "agent": "Classifier Agent"
+        },
+        "route_to": "Retrieval Agent",
+        "retrieval_result": {
+            "found": true,
+            "kb_id": "KB-001",
+            "title": "WiFi connection issue",
+            "category": "Network",
+            "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
+            "confidence_score": 0.47,
+            "distance": 1.1273261308670044,
+            "top_matches": [
+                {
+                    "kb_id": "KB-001",
+                    "title": "WiFi connection issue",
+                    "category": "Network",
+                    "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
+                    "keywords": "wifi, internet, network, connection, not connecting",
+                    "distance": 1.1273261308670044,
+                    "confidence_score": 0.47,
+                    "document": "Category: Network\nTitle: WiFi connection issue\nKeywords: wifi, internet, network, connection, not connecting\nSolution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
+                    "id": "KB-001"
+                },
+                {
+                    "kb_id": "KB-006",
+                    "title": "VPN access issue",
+                    "category": "Access",
+                    "solution": "Check your internet connection, restart the VPN client, verify credentials, and ensure MFA approval is completed.",
+                    "keywords": "vpn, access, remote, connection",
+                    "distance": 1.3203651905059814,
+                    "confidence_score": 0.431,
+                    "document": "Category: Access\nTitle: VPN access issue\nKeywords: vpn, access, remote, connection\nSolution: Check your internet connection, restart the VPN client, verify credentials, and ensure MFA approval is completed.",
+                    "id": "KB-006"
+                },
+                {
+                    "kb_id": "KB-002",
+                    "title": "Password reset issue",
+                    "category": "Access",
+                    "solution": "Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
+                    "keywords": "password, login, account, reset, forgot",
+                    "distance": 1.57439386844635,
+                    "confidence_score": 0.388,
+                    "document": "Category: Access\nTitle: Password reset issue\nKeywords: password, login, account, reset, forgot\nSolution: Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
+                    "id": "KB-002"
+                }
+            ],
+            "retrieval_type": "ChromaDB Vector Search",
+            "agent": "Vector Retrieval Agent"
+        },
+        "ticket": null,
+        "escalation": null,
+        "final_response": "Dear User,\n\nThank you for reaching out to our IT service desk. Your issue has been classified as a Network issue. \n\nTo resolve your WiFi connection issue, please try the following steps:\n\n1. Restart your router.\n2. Reconnect to the office wireless network.\n3. Forget and re-add the network.\n4. Ensure that airplane mode is turned off.\n\nIf you continue to experience issues, please do not hesitate to contact us for further assistance.\n\nBest regards,\nHelpSync AI",
+        "created_at": "2026-06-09 00:37:08",
+        "agent": "Memory Agent"
     }
 ]

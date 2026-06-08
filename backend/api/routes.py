@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
 from agents.langgraph_supervisor import run_langgraph_workflow
@@ -14,12 +15,18 @@ from agents.feedback_agent import (
     get_all_feedback,
     get_feedback_summary
 )
+from agents.auth_agent import (
+    register_user,
+    login_user,
+    get_current_active_user
+)
 from data.chroma_store import seed_knowledge_base, reset_knowledge_base
 from data.postgres_store import (
     init_postgres_tables,
     get_postgres_status,
     get_recent_postgres_conversations
 )
+
 
 router = APIRouter()
 
@@ -31,6 +38,7 @@ class ChatRequest(BaseModel):
 class ReportRequest(BaseModel):
     conversation_id: str | None = None
 
+
 class FeedbackRequest(BaseModel):
     conversation_id: str | None = None
     helpful: bool
@@ -38,31 +46,113 @@ class FeedbackRequest(BaseModel):
     comment: str = ""
     improvement_suggestion: str = ""
 
+
+class RegisterRequest(BaseModel):
+    username: str
+    email: str | None = None
+    full_name: str | None = None
+    password: str
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+@router.post("/auth/register")
+def auth_register(request: RegisterRequest):
+    result = register_user(
+        username=request.username,
+        email=request.email,
+        full_name=request.full_name,
+        password=request.password
+    )
+
+    if not result.get("registered"):
+        raise HTTPException(
+            status_code=400,
+            detail=result.get("message")
+        )
+
+    return {
+        "current_stage": "Phase 19 - JWT Authentication",
+        **result
+    }
+
+
+@router.post("/auth/login")
+def auth_login(request: LoginRequest):
+    result = login_user(
+        username=request.username,
+        password=request.password
+    )
+
+    if not result.get("logged_in"):
+        raise HTTPException(
+            status_code=401,
+            detail=result.get("message")
+        )
+
+    return {
+        "current_stage": "Phase 19 - JWT Authentication",
+        **result
+    }
+@router.post("/auth/token")
+def auth_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    result = login_user(
+        username=form_data.username,
+        password=form_data.password
+    )
+
+    if not result.get("logged_in"):
+        raise HTTPException(
+            status_code=401,
+            detail=result.get("message")
+        )
+
+    return {
+        "access_token": result.get("access_token"),
+        "token_type": "bearer"
+    }
+
+@router.get("/auth/me")
+def auth_me(current_user: dict = Depends(get_current_active_user)):
+    return {
+        "current_stage": "Phase 19 - JWT Authentication",
+        "user": current_user
+    }
+
+
 @router.post("/chat")
 def chat(request: ChatRequest):
-    """
-    Main chat endpoint.
-    Sends user query into the LangGraph multi-agent workflow.
-    """
-
     result = run_langgraph_workflow(request.user_query)
 
     return {
-        "current_stage": "Phase 12 - Final Report Generator",
+        "current_stage": "Phase 19 - JWT Authentication",
+        **result
+    }
+
+
+@router.post("/secure/chat")
+def secure_chat(
+    request: ChatRequest,
+    current_user: dict = Depends(get_current_active_user)
+):
+    result = run_langgraph_workflow(request.user_query)
+
+    return {
+        "current_stage": "Phase 19 - JWT Authentication",
+        "authenticated_user": current_user,
         **result
     }
 
 
 @router.get("/history")
 def history():
-    """
-    Returns recent conversation history stored by Memory Agent.
-    """
-
     conversations = get_recent_conversations(limit=10)
 
     return {
-        "current_stage": "Phase 12 - Final Report Generator",
+        "current_stage": "Phase 19 - JWT Authentication",
         "total_returned": len(conversations),
         "conversations": conversations
     }
@@ -70,28 +160,20 @@ def history():
 
 @router.get("/dashboard/stats")
 def dashboard_stats():
-    """
-    Returns dashboard analytics.
-    """
-
     stats = get_dashboard_stats()
 
     return {
-        "current_stage": "Phase 12 - Final Report Generator",
+        "current_stage": "Phase 19 - JWT Authentication",
         "dashboard": stats
     }
 
 
 @router.get("/dashboard/tickets")
 def dashboard_tickets():
-    """
-    Returns all created support tickets.
-    """
-
     tickets = get_all_tickets()
 
     return {
-        "current_stage": "Phase 12 - Final Report Generator",
+        "current_stage": "Phase 19 - JWT Authentication",
         "total_tickets": len(tickets),
         "tickets": tickets
     }
@@ -99,14 +181,10 @@ def dashboard_tickets():
 
 @router.get("/dashboard/escalations")
 def dashboard_escalations():
-    """
-    Returns all escalation records.
-    """
-
     escalations = get_all_escalations()
 
     return {
-        "current_stage": "Phase 12 - Final Report Generator",
+        "current_stage": "Phase 19 - JWT Authentication",
         "total_escalations": len(escalations),
         "escalations": escalations
     }
@@ -114,38 +192,27 @@ def dashboard_escalations():
 
 @router.post("/reports/generate")
 def generate_report(request: ReportRequest):
-    """
-    Generates a final service desk report.
-    If conversation_id is null, it generates a report for the latest conversation.
-    """
-
     report = generate_service_report(request.conversation_id)
 
     return {
-        "current_stage": "Phase 12 - Final Report Generator",
+        "current_stage": "Phase 19 - JWT Authentication",
         "report": report
     }
 
 
 @router.get("/reports")
 def reports():
-    """
-    Returns all generated reports.
-    """
-
     all_reports = get_all_reports()
 
     return {
-        "current_stage": "Phase 12 - Final Report Generator",
+        "current_stage": "Phase 19 - JWT Authentication",
         "total_reports": len(all_reports),
         "reports": all_reports
     }
+
+
 @router.post("/feedback")
 def submit_feedback(request: FeedbackRequest):
-    """
-    Stores human feedback for a conversation.
-    """
-
     feedback = create_feedback(
         conversation_id=request.conversation_id,
         helpful=request.helpful,
@@ -155,7 +222,7 @@ def submit_feedback(request: FeedbackRequest):
     )
 
     return {
-        "current_stage": "Phase 13 - Human Feedback and Learning Loop",
+        "current_stage": "Phase 19 - JWT Authentication",
         "message": "Feedback submitted successfully.",
         "feedback": feedback
     }
@@ -163,25 +230,23 @@ def submit_feedback(request: FeedbackRequest):
 
 @router.get("/feedback")
 def feedback_records():
-    """
-    Returns all feedback records and summary.
-    """
-
     feedback = get_all_feedback()
     summary = get_feedback_summary()
 
     return {
-        "current_stage": "Phase 13 - Human Feedback and Learning Loop",
+        "current_stage": "Phase 19 - JWT Authentication",
         "summary": summary,
         "total_feedback": len(feedback),
         "feedback": feedback
     }
+
+
 @router.post("/vector/seed")
 def seed_vector_database():
     result = seed_knowledge_base()
 
     return {
-        "current_stage": "Phase 15 - ChromaDB Vector Retrieval",
+        "current_stage": "Phase 19 - JWT Authentication",
         "result": result
     }
 
@@ -191,15 +256,17 @@ def reset_vector_database():
     result = reset_knowledge_base()
 
     return {
-        "current_stage": "Phase 15 - ChromaDB Vector Retrieval",
+        "current_stage": "Phase 19 - JWT Authentication",
         "result": result
     }
+
+
 @router.post("/postgres/init")
 def postgres_init():
     result = init_postgres_tables()
 
     return {
-        "current_stage": "Phase 18 - PostgreSQL Database",
+        "current_stage": "Phase 19 - JWT Authentication",
         "result": result
     }
 
@@ -209,7 +276,7 @@ def postgres_status():
     result = get_postgres_status()
 
     return {
-        "current_stage": "Phase 18 - PostgreSQL Database",
+        "current_stage": "Phase 19 - JWT Authentication",
         "result": result
     }
 
@@ -219,7 +286,7 @@ def postgres_conversations():
     conversations = get_recent_postgres_conversations(limit=10)
 
     return {
-        "current_stage": "Phase 18 - PostgreSQL Database",
+        "current_stage": "Phase 19 - JWT Authentication",
         "total_returned": len(conversations),
         "conversations": conversations
     }
