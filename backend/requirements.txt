@@ -8,3 +8,5 @@ requests
 chromadb
 groq
 langsmith
+sqlalchemy
+psycopg[binary]

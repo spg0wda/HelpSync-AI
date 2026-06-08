@@ -15,6 +15,11 @@ from agents.feedback_agent import (
     get_feedback_summary
 )
 from data.chroma_store import seed_knowledge_base, reset_knowledge_base
+from data.postgres_store import (
+    init_postgres_tables,
+    get_postgres_status,
+    get_recent_postgres_conversations
+)
 
 router = APIRouter()
 
@@ -188,4 +193,33 @@ def reset_vector_database():
     return {
         "current_stage": "Phase 15 - ChromaDB Vector Retrieval",
         "result": result
+    }
+@router.post("/postgres/init")
+def postgres_init():
+    result = init_postgres_tables()
+
+    return {
+        "current_stage": "Phase 18 - PostgreSQL Database",
+        "result": result
+    }
+
+
+@router.get("/postgres/status")
+def postgres_status():
+    result = get_postgres_status()
+
+    return {
+        "current_stage": "Phase 18 - PostgreSQL Database",
+        "result": result
+    }
+
+
+@router.get("/postgres/conversations")
+def postgres_conversations():
+    conversations = get_recent_postgres_conversations(limit=10)
+
+    return {
+        "current_stage": "Phase 18 - PostgreSQL Database",
+        "total_returned": len(conversations),
+        "conversations": conversations
     }
