@@ -1,0 +1,18 @@
+[
+    {
+        "note_id": "LN-0080D5C1",
+        "source_feedback_id": "FB-1099F018",
+        "conversation_id": "conv3005",
+        "priority": "High",
+        "confidence_score": 90,
+        "status": "applied",
+        "rating": 2,
+        "helpful": true,
+        "user_comment": "",
+        "improvement_suggestion": "",
+        "suggested_update": "For similar future issues, improve the response by addressing this feedback: User was not fully satisfied with the service desk response.. Provide clearer troubleshooting steps, ask one confirmation question if required, and create or escalate a ticket when the issue cannot be resolved directly.",
+        "created_at": "2026-06-09 01:10:50",
+        "applied_at": "2026-06-09 01:11:07",
+        "approved_id": "AL-0584C293"
+    }
+]

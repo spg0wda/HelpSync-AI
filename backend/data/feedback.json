@@ -1,1 +1,47 @@
-[]
+[
+    {
+        "feedback_id": "FB-E6CFF1E7",
+        "conversation_id": null,
+        "helpful": true,
+        "rating": 5,
+        "comment": "",
+        "improvement_suggestion": "",
+        "created_at": "2026-06-09 01:08:01"
+    },
+    {
+        "feedback_id": "FB-36401E08",
+        "conversation_id": null,
+        "helpful": true,
+        "rating": 5,
+        "comment": "",
+        "improvement_suggestion": "",
+        "created_at": "2026-06-09 01:08:34"
+    },
+    {
+        "feedback_id": "FB-527AAB1A",
+        "conversation_id": "conv3005",
+        "helpful": true,
+        "rating": 5,
+        "comment": "",
+        "improvement_suggestion": "",
+        "created_at": "2026-06-09 01:08:53"
+    },
+    {
+        "feedback_id": "FB-1099F018",
+        "conversation_id": "conv3005",
+        "helpful": true,
+        "rating": 2,
+        "comment": "",
+        "improvement_suggestion": "",
+        "created_at": "2026-06-09 01:10:44"
+    },
+    {
+        "feedback_id": "FB-C2C32BE0",
+        "conversation_id": "conv3005",
+        "helpful": true,
+        "rating": 2,
+        "comment": "",
+        "improvement_suggestion": "",
+        "created_at": "2026-06-09 01:11:14"
+    }
+]
