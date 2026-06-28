@@ -557,5 +557,136 @@
         "final_response": "Dear User,\n\nThank you for reaching out to our IT service desk. Your issue with connecting to the office wireless network has been classified as a Network issue. \n\nTo resolve this issue, please try restarting your router, reconnecting to the WiFi network, forgetting and re-adding the network, and ensuring that airplane mode is turned off. If you continue to experience issues, please don't hesitate to contact us for further assistance.\n\nBest regards,\nHelpSync AI",
         "created_at": "2026-06-09 00:48:32",
         "agent": "Memory Agent"
+    },
+    {
+        "conversation_id": "CONV-3011",
+        "user_query": "I cannot connect to office Wi-Fi",
+        "classification": {
+            "status": "failed",
+            "error": "'dict' object has no attribute 'lower'",
+            "message": "classify_issue could not process the request."
+        },
+        "route_to": "langgraph_supervisor",
+        "retrieval_result": {
+            "status": "failed",
+            "error": "retrieve_solution() missing 1 required positional argument: 'issue_type'",
+            "message": "retrieve_solution could not process the request."
+        },
+        "ticket": {
+            "status": "failed",
+            "error": "create_ticket() missing 2 required positional arguments: 'issue_type' and 'priority'",
+            "message": "create_ticket could not process the request."
+        },
+        "escalation": null,
+        "final_response": "HelpSync AI has analyzed your issue.\n\nIssue:\nI cannot connect to office Wi-Fi\n\nClassification:\nclassify_issue could not process the request.\n\nSuggested Solution:\nretrieve_solution could not process the request.\n\n\nTicket Status:\nA support ticket has been created or prepared.\n\nTicket Details:\ncreate_ticket could not process the request.\n\n\nBasic Troubleshooting Steps:\n1. Restart your device or affected application.\n2. Check your internet or network connection.\n3. Sign out and sign in again.\n4. If it is a Wi-Fi issue, turn Wi-Fi off and on.\n5. Forget and reconnect to the office Wi-Fi network.\n6. Restart the network adapter.\n7. If the issue continues, contact the IT support team.",
+        "created_at": "2026-06-28 10:41:27",
+        "agent": "Memory Agent"
+    },
+    {
+        "conversation_id": "CONV-3012",
+        "user_query": "I cannot connect to office Wi-Fi",
+        "classification": {
+            "issue_type": "General",
+            "priority": "Low",
+            "route_to": "Retrieval Agent",
+            "agent": "Classifier Agent"
+        },
+        "route_to": "langgraph_supervisor",
+        "retrieval_result": {
+            "found": true,
+            "kb_id": "KB-001",
+            "title": "WiFi connection issue",
+            "category": "Network",
+            "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
+            "confidence_score": 0.479,
+            "distance": 1.0878890752792358,
+            "top_matches": [
+                {
+                    "kb_id": "KB-001",
+                    "title": "WiFi connection issue",
+                    "category": "Network",
+                    "solution": "Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
+                    "keywords": "wifi, internet, network, connection, not connecting",
+                    "distance": 1.0878890752792358,
+                    "confidence_score": 0.479,
+                    "document": "Category: Network\nTitle: WiFi connection issue\nKeywords: wifi, internet, network, connection, not connecting\nSolution: Restart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.",
+                    "id": "KB-001"
+                },
+                {
+                    "kb_id": "KB-006",
+                    "title": "VPN access issue",
+                    "category": "Access",
+                    "solution": "Check your internet connection, restart the VPN client, verify credentials, and ensure MFA approval is completed.",
+                    "keywords": "vpn, access, remote, connection",
+                    "distance": 1.406723141670227,
+                    "confidence_score": 0.416,
+                    "document": "Category: Access\nTitle: VPN access issue\nKeywords: vpn, access, remote, connection\nSolution: Check your internet connection, restart the VPN client, verify credentials, and ensure MFA approval is completed.",
+                    "id": "KB-006"
+                },
+                {
+                    "kb_id": "KB-002",
+                    "title": "Password reset issue",
+                    "category": "Access",
+                    "solution": "Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
+                    "keywords": "password, login, account, reset, forgot",
+                    "distance": 1.585419774055481,
+                    "confidence_score": 0.387,
+                    "document": "Category: Access\nTitle: Password reset issue\nKeywords: password, login, account, reset, forgot\nSolution: Use the password reset portal. If your account is locked, wait 15 minutes or contact IT support.",
+                    "id": "KB-002"
+                }
+            ],
+            "retrieval_type": "ChromaDB Vector Search",
+            "agent": "Vector Retrieval Agent",
+            "learning_note_support": {
+                "found": true,
+                "retrieval_type": "Approved Learning Notes",
+                "agent": "Autonomous Learning Retrieval Agent",
+                "issue_type": "General",
+                "solution": "For similar future issues, improve the response by addressing this feedback: User was not fully satisfied with the service desk response.. Provide clearer troubleshooting steps, ask one confirmation question if required, and create or escalate a ticket when the issue cannot be resolved directly.",
+                "confidence_score": 1,
+                "matched_learning_note": {
+                    "note_id": "LN-0080D5C1",
+                    "source_feedback_id": "FB-1099F018",
+                    "conversation_id": "conv3005",
+                    "priority": "High",
+                    "confidence_score": 90,
+                    "status": "applied",
+                    "rating": 2,
+                    "helpful": true,
+                    "user_comment": "",
+                    "improvement_suggestion": "",
+                    "suggested_update": "For similar future issues, improve the response by addressing this feedback: User was not fully satisfied with the service desk response.. Provide clearer troubleshooting steps, ask one confirmation question if required, and create or escalate a ticket when the issue cannot be resolved directly.",
+                    "created_at": "2026-06-09 01:10:50",
+                    "applied_at": "2026-06-09 01:11:07",
+                    "approved_id": "AL-0584C293"
+                },
+                "top_matches": [
+                    {
+                        "score": 1,
+                        "note": {
+                            "note_id": "LN-0080D5C1",
+                            "source_feedback_id": "FB-1099F018",
+                            "conversation_id": "conv3005",
+                            "priority": "High",
+                            "confidence_score": 90,
+                            "status": "applied",
+                            "rating": 2,
+                            "helpful": true,
+                            "user_comment": "",
+                            "improvement_suggestion": "",
+                            "suggested_update": "For similar future issues, improve the response by addressing this feedback: User was not fully satisfied with the service desk response.. Provide clearer troubleshooting steps, ask one confirmation question if required, and create or escalate a ticket when the issue cannot be resolved directly.",
+                            "created_at": "2026-06-09 01:10:50",
+                            "applied_at": "2026-06-09 01:11:07",
+                            "approved_id": "AL-0584C293"
+                        }
+                    }
+                ]
+            }
+        },
+        "ticket": null,
+        "escalation": null,
+        "final_response": "HelpSync AI has analyzed your issue.\n\nIssue:\nI cannot connect to office Wi-Fi\n\nIssue Type:\nGeneral\n\nPriority:\nLow\n\nSuggested Solution:\nRestart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.\n\n\nWi-Fi Troubleshooting Steps:\n1. Turn Wi-Fi off and on.\n2. Check if airplane mode is disabled.\n3. Forget and reconnect to the office Wi-Fi network.\n4. Restart your laptop or mobile device.\n5. Restart the network adapter.\n6. Move closer to the router or access point.\n7. Contact IT support if the issue continues.",
+        "created_at": "2026-06-28 10:47:27",
+        "agent": "Memory Agent"
     }
 ]

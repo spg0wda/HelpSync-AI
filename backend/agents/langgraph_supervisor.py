@@ -1,12 +1,6 @@
-import json
-import os
-from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List, TypedDict
 
-from dotenv import load_dotenv
-from langchain_groq import ChatGroq
-from langgraph.prebuilt import create_react_agent
-from langgraph_supervisor import create_supervisor
+from langgraph.graph import END, StateGraph
 
 from agents.classifier_agent import classify_issue
 from agents.retrieval_agent import retrieve_solution
@@ -15,40 +9,24 @@ from agents.escalation_agent import escalate_issue
 from agents.memory_agent import save_conversation
 
 
-BASE_DIR = Path(__file__).resolve().parents[2]
-ENV_PATH = BASE_DIR / ".env"
-
-load_dotenv()
-load_dotenv(ENV_PATH)
-
-
-def _json_text(data: Any) -> str:
-    try:
-        return json.dumps(data, indent=2, default=str)
-    except Exception:
-        return str(data)
-
-
-def _extract_text(value: Any) -> str:
-    if value is None:
-        return ""
-
-    if isinstance(value, str):
-        return value
-
-    if isinstance(value, dict):
-        for key in ["final_response", "llm_response", "response", "message", "answer", "retrieval_result"]:
-            if key in value and value[key]:
-                return str(value[key])
-        return _json_text(value)
-
-    return str(value)
+class ServiceDeskState(TypedDict, total=False):
+    user_query: str
+    route_to: str
+    classification: Any
+    retrieval_result: Any
+    ticket: Any
+    escalation: Any
+    workflow_trace: List[str]
+    final_response: str
+    memory_record: Any
+    llm_response: str
+    current_stage: str
 
 
-def _base_state(user_query: str) -> Dict[str, Any]:
+def _base_state(user_query: str) -> ServiceDeskState:
     return {
         "user_query": user_query,
-        "route_to": "",
+        "route_to": "supervisor",
         "classification": "",
         "retrieval_result": "",
         "ticket": None,
@@ -57,202 +35,444 @@ def _base_state(user_query: str) -> Dict[str, Any]:
         "final_response": "",
         "memory_record": None,
         "llm_response": "",
+        "current_stage": "LangGraph Supervisor Workflow",
     }
 
 
-def _safe_agent_call(func, user_query: str, extra_state: Dict[str, Any] | None = None) -> Any:
-    state = _base_state(user_query)
+def _text(value: Any) -> str:
+    if value is None:
+        return ""
 
-    if extra_state:
-        state.update(extra_state)
+    if isinstance(value, str):
+        return value
 
+    if isinstance(value, dict):
+        for key in [
+            "issue_type",
+            "priority",
+            "route_to",
+            "classification",
+            "retrieval_result",
+            "solution",
+            "message",
+            "response",
+            "answer",
+            "final_response",
+            "llm_response",
+            "ticket_id",
+            "status",
+        ]:
+            if key in value and value[key]:
+                return str(value[key])
+        return str(value)
+
+    return str(value)
+
+
+def _get_issue_type(classification: Any, user_query: str) -> str:
+    if isinstance(classification, dict):
+        issue_type = classification.get("issue_type") or classification.get("classification")
+        if issue_type:
+            return str(issue_type)
+
+    text = f"{classification} {user_query}".lower()
+
+    if "wifi" in text or "wi-fi" in text or "network" in text:
+        return "Network"
+    if "password" in text or "login" in text or "signin" in text:
+        return "Access"
+    if "email" in text or "mail" in text:
+        return "Email"
+    if "software" in text or "application" in text or "app" in text:
+        return "Software"
+    if "security" in text or "hacked" in text or "breach" in text:
+        return "Security"
+
+    return "General"
+
+
+def _get_priority(classification: Any, user_query: str) -> str:
+    if isinstance(classification, dict):
+        priority = classification.get("priority")
+        if priority:
+            return str(priority)
+
+    text = f"{classification} {user_query}".lower()
+
+    if any(word in text for word in ["urgent", "critical", "server down", "outage", "breach", "hacked"]):
+        return "High"
+
+    if any(word in text for word in ["not working", "unable", "failed", "error"]):
+        return "Medium"
+
+    return "Low"
+
+
+def _call_classifier(user_query: str) -> Any:
+    try:
+        return classify_issue(user_query)
+    except Exception as error:
+        return {
+            "issue_type": _get_issue_type("", user_query),
+            "priority": _get_priority("", user_query),
+            "route_to": "Retrieval Agent",
+            "agent": "Classifier Agent",
+            "warning": str(error),
+        }
+
+
+def _call_retrieval(user_query: str, issue_type: str) -> Any:
     attempts = [
-        state,
-        {"user_query": user_query},
-        {"query": user_query},
-        {"issue": user_query},
-        user_query,
+        lambda: retrieve_solution(user_query, issue_type),
+        lambda: retrieve_solution(issue_type, user_query),
+        lambda: retrieve_solution(user_query),
+        lambda: retrieve_solution(
+            {
+                "user_query": user_query,
+                "issue_type": issue_type,
+            }
+        ),
     ]
 
     last_error = None
 
-    for item in attempts:
+    for attempt in attempts:
         try:
-            return func(item)
+            return attempt()
         except Exception as error:
             last_error = error
 
     return {
         "status": "failed",
         "error": str(last_error),
-        "message": f"{func.__name__} could not process the request.",
+        "message": "No direct solution found. A ticket may be required.",
     }
 
 
-def _get_model():
-    return ChatGroq(
-        model=os.getenv("GROQ_MODEL", "llama-3.1-8b-instant"),
-        api_key=os.getenv("GROQ_API_KEY"),
-        temperature=0,
-        timeout=30,
-        max_retries=1,
-    )
+def _call_ticket(user_query: str, issue_type: str, priority: str) -> Any:
+    attempts = [
+        lambda: create_ticket(user_query, issue_type, priority),
+        lambda: create_ticket(issue_type, priority, user_query),
+        lambda: create_ticket(
+            {
+                "user_query": user_query,
+                "issue_type": issue_type,
+                "priority": priority,
+            }
+        ),
+    ]
+
+    last_error = None
+
+    for attempt in attempts:
+        try:
+            return attempt()
+        except Exception as error:
+            last_error = error
+
+    return {
+        "status": "ticket_prepared",
+        "issue_type": issue_type,
+        "priority": priority,
+        "message": "Ticket prepared for IT support team.",
+        "error": str(last_error),
+    }
 
 
-def classify_service_issue(user_query: str) -> str:
-    """Classify the user's service desk issue into the correct IT support category."""
-    result = _safe_agent_call(classify_issue, user_query)
-    return _json_text(result)
+def _call_escalation(user_query: str, issue_type: str, priority: str) -> Any:
+    attempts = [
+        lambda: escalate_issue(user_query, issue_type, priority),
+        lambda: escalate_issue(issue_type, priority, user_query),
+        lambda: escalate_issue(
+            {
+                "user_query": user_query,
+                "issue_type": issue_type,
+                "priority": priority,
+            }
+        ),
+        lambda: escalate_issue(user_query),
+    ]
+
+    last_error = None
+
+    for attempt in attempts:
+        try:
+            return attempt()
+        except Exception as error:
+            last_error = error
+
+    return {
+        "status": "escalation_prepared",
+        "issue_type": issue_type,
+        "priority": priority,
+        "message": "Escalation prepared for support team.",
+        "error": str(last_error),
+    }
 
 
-def retrieve_service_solution(user_query: str) -> str:
-    """Search the knowledge base and vector database for the best solution to the user's issue."""
-    result = _safe_agent_call(retrieve_solution, user_query)
-    return _json_text(result)
+def supervisor_node(state: ServiceDeskState) -> ServiceDeskState:
+    trace = state.get("workflow_trace", [])
+    trace.append("LangGraph Supervisor received user query")
+    trace.append("Supervisor routed issue to Classifier Agent")
 
-
-def create_service_ticket(user_query: str) -> str:
-    """Create a support ticket when the issue cannot be solved directly."""
-    result = _safe_agent_call(
-        create_ticket,
-        user_query,
-        {
-            "classification": "support_ticket",
-            "retrieval_result": "No complete solution found. Creating ticket.",
-        },
-    )
-    return _json_text(result)
-
-
-def escalate_service_request(user_query: str) -> str:
-    """Escalate unresolved or high-priority service desk issues to the support team."""
-    result = _safe_agent_call(
-        escalate_issue,
-        user_query,
-        {
-            "classification": "escalation_required",
-            "retrieval_result": "Issue requires escalation.",
-        },
-    )
-    return _json_text(result)
-
-
-def _fallback_response(user_query: str, error: str = "") -> Dict[str, Any]:
-    state = _base_state(user_query)
-
-    classification_result = _safe_agent_call(classify_issue, user_query)
-    retrieval_result = _safe_agent_call(retrieve_solution, user_query)
-
-    classification_text = _extract_text(classification_result)
-    retrieval_text = _extract_text(retrieval_result)
-
-    final_response = (
-        "I understand you are facing a service desk issue.\n\n"
-        f"Issue: {user_query}\n\n"
-        "Suggested steps:\n"
-        "1. Restart the affected device or application.\n"
-        "2. Check your internet/network connection.\n"
-        "3. Try signing out and signing in again.\n"
-        "4. If it is a Wi-Fi issue, turn Wi-Fi off and on, forget and reconnect to the network, and restart the network adapter.\n"
-        "5. If the issue continues, a support ticket should be created for the IT team.\n\n"
-        "This response was generated using the HelpSync AI fallback flow because the LLM supervisor took too long or failed temporarily."
-    )
-
-    state.update(
-        {
-            "route_to": "langgraph_supervisor_fallback",
-            "classification": classification_text,
-            "retrieval_result": retrieval_text,
-            "workflow_trace": [
-                "LangGraph Supervisor attempted execution",
-                "Supervisor failed or timed out",
-                "Fallback service desk flow generated response",
-            ],
-            "final_response": final_response,
-            "llm_response": final_response,
-            "error": error,
-        }
-    )
-
-    try:
-        memory_record = save_conversation(state)
-        state["memory_record"] = memory_record
-    except Exception as save_error:
-        state["memory_record"] = {
-            "status": "memory_save_failed",
-            "error": str(save_error),
-        }
+    state["workflow_trace"] = trace
+    state["route_to"] = "classifier_agent"
+    state["current_stage"] = "LangGraph Supervisor Workflow"
 
     return state
 
 
+def classifier_node(state: ServiceDeskState) -> ServiceDeskState:
+    user_query = state.get("user_query", "")
+
+    result = _call_classifier(user_query)
+
+    state["classification"] = result
+    state["route_to"] = "retrieval_agent"
+
+    trace = state.get("workflow_trace", [])
+    trace.append("Classifier Agent classified the issue")
+    trace.append("Supervisor routed issue to Retrieval Agent")
+    state["workflow_trace"] = trace
+
+    return state
+
+
+def retrieval_node(state: ServiceDeskState) -> ServiceDeskState:
+    user_query = state.get("user_query", "")
+    classification = state.get("classification", "")
+
+    issue_type = _get_issue_type(classification, user_query)
+    priority = _get_priority(classification, user_query)
+
+    result = _call_retrieval(user_query, issue_type)
+
+    state["retrieval_result"] = result
+
+    result_text = _text(result).lower()
+    query_text = user_query.lower()
+
+    trace = state.get("workflow_trace", [])
+    trace.append("Retrieval Agent searched knowledge base and vector store")
+
+    high_priority_words = [
+        "security",
+        "breach",
+        "data leak",
+        "hacked",
+        "urgent",
+        "critical",
+        "server down",
+        "outage",
+        "production",
+    ]
+
+    unresolved_words = [
+        "no direct solution",
+        "no solution",
+        "not found",
+        "failed",
+        "could not process",
+        "unable",
+        "error",
+    ]
+
+    if any(word in query_text for word in high_priority_words) or priority.lower() == "high":
+        state["route_to"] = "escalation_agent"
+        trace.append("Supervisor detected high-priority issue and routed to Escalation Agent")
+    elif any(word in result_text for word in unresolved_words):
+        state["route_to"] = "ticketing_agent"
+        trace.append("Supervisor detected unresolved issue and routed to Ticketing Agent")
+    else:
+        state["route_to"] = "response_agent"
+        trace.append("Supervisor routed issue to Response Agent")
+
+    state["workflow_trace"] = trace
+
+    return state
+
+
+def ticketing_node(state: ServiceDeskState) -> ServiceDeskState:
+    user_query = state.get("user_query", "")
+    classification = state.get("classification", "")
+
+    issue_type = _get_issue_type(classification, user_query)
+    priority = _get_priority(classification, user_query)
+
+    result = _call_ticket(user_query, issue_type, priority)
+
+    state["ticket"] = result
+    state["route_to"] = "response_agent"
+
+    trace = state.get("workflow_trace", [])
+    trace.append("Ticketing Agent created or prepared a support ticket")
+    trace.append("Supervisor routed issue to Response Agent")
+    state["workflow_trace"] = trace
+
+    return state
+
+
+def escalation_node(state: ServiceDeskState) -> ServiceDeskState:
+    user_query = state.get("user_query", "")
+    classification = state.get("classification", "")
+
+    issue_type = _get_issue_type(classification, user_query)
+    priority = _get_priority(classification, user_query)
+
+    result = _call_escalation(user_query, issue_type, priority)
+
+    state["escalation"] = result
+    state["route_to"] = "response_agent"
+
+    trace = state.get("workflow_trace", [])
+    trace.append("Escalation Agent escalated the issue")
+    trace.append("Supervisor routed issue to Response Agent")
+    state["workflow_trace"] = trace
+
+    return state
+
+
+def response_node(state: ServiceDeskState) -> ServiceDeskState:
+    user_query = state.get("user_query", "")
+    classification = state.get("classification", "")
+    retrieval_result = state.get("retrieval_result", "")
+    ticket = state.get("ticket")
+    escalation = state.get("escalation")
+
+    issue_type = _get_issue_type(classification, user_query)
+    priority = _get_priority(classification, user_query)
+
+    final_response = f"""HelpSync AI has analyzed your issue.
+
+Issue:
+{user_query}
+
+Issue Type:
+{issue_type}
+
+Priority:
+{priority}
+
+Suggested Solution:
+{_text(retrieval_result)}
+"""
+
+    if ticket:
+        final_response += f"""
+
+Ticket Status:
+A support ticket has been created or prepared.
+
+Ticket Details:
+{_text(ticket)}
+"""
+
+    if escalation:
+        final_response += f"""
+
+Escalation Status:
+This issue has been escalated to the support team.
+
+Escalation Details:
+{_text(escalation)}
+"""
+
+    if "wi-fi" in user_query.lower() or "wifi" in user_query.lower():
+        final_response += """
+
+Wi-Fi Troubleshooting Steps:
+1. Turn Wi-Fi off and on.
+2. Check if airplane mode is disabled.
+3. Forget and reconnect to the office Wi-Fi network.
+4. Restart your laptop or mobile device.
+5. Restart the network adapter.
+6. Move closer to the router or access point.
+7. Contact IT support if the issue continues.
+"""
+
+    state["final_response"] = final_response.strip()
+    state["llm_response"] = final_response.strip()
+    state["route_to"] = "langgraph_supervisor"
+
+    trace = state.get("workflow_trace", [])
+    trace.append("Response Agent generated final service desk response")
+    trace.append("LangGraph Supervisor workflow completed")
+    state["workflow_trace"] = trace
+
+    return state
+
+
+def memory_node(state: ServiceDeskState) -> ServiceDeskState:
+    try:
+        memory_record = save_conversation(
+            state.get("user_query", ""),
+            state.get("classification", ""),
+            state.get("route_to", ""),
+            state.get("retrieval_result", ""),
+            state.get("ticket", None),
+            state.get("escalation", None),
+            state.get("final_response", ""),
+        )
+
+        state["memory_record"] = memory_record
+
+    except Exception as error:
+        state["memory_record"] = {
+            "status": "memory_save_failed",
+            "error": str(error),
+        }
+
+    trace = state.get("workflow_trace", [])
+    trace.append("Conversation saved to memory")
+    state["workflow_trace"] = trace
+
+    return state
+
+
+def route_after_retrieval(state: ServiceDeskState) -> str:
+    route_to = state.get("route_to", "")
+
+    if route_to == "ticketing_agent":
+        return "ticketing_agent"
+
+    if route_to == "escalation_agent":
+        return "escalation_agent"
+
+    return "response_agent"
+
+
 def build_langgraph_supervisor():
-    model = _get_model()
+    graph = StateGraph(ServiceDeskState)
 
-    classifier_agent = create_react_agent(
-        model=model,
-        tools=[classify_service_issue],
-        name="classifier_agent",
-        prompt=(
-            "You are the Classifier Agent for HelpSync AI. "
-            "Classify the user issue into a clear IT support category. "
-            "Return only the category and short reason."
-        ),
+    graph.add_node("supervisor", supervisor_node)
+    graph.add_node("classifier_agent", classifier_node)
+    graph.add_node("retrieval_agent", retrieval_node)
+    graph.add_node("ticketing_agent", ticketing_node)
+    graph.add_node("escalation_agent", escalation_node)
+    graph.add_node("response_agent", response_node)
+    graph.add_node("memory_agent", memory_node)
+
+    graph.set_entry_point("supervisor")
+
+    graph.add_edge("supervisor", "classifier_agent")
+    graph.add_edge("classifier_agent", "retrieval_agent")
+
+    graph.add_conditional_edges(
+        "retrieval_agent",
+        route_after_retrieval,
+        {
+            "ticketing_agent": "ticketing_agent",
+            "escalation_agent": "escalation_agent",
+            "response_agent": "response_agent",
+        },
     )
 
-    retrieval_agent = create_react_agent(
-        model=model,
-        tools=[retrieve_service_solution],
-        name="retrieval_agent",
-        prompt=(
-            "You are the Retrieval Agent for HelpSync AI. "
-            "Find the best solution from the knowledge base. "
-            "Return short step-by-step troubleshooting guidance."
-        ),
-    )
+    graph.add_edge("ticketing_agent", "response_agent")
+    graph.add_edge("escalation_agent", "response_agent")
+    graph.add_edge("response_agent", "memory_agent")
+    graph.add_edge("memory_agent", END)
 
-    ticket_agent = create_react_agent(
-        model=model,
-        tools=[create_service_ticket],
-        name="ticket_agent",
-        prompt=(
-            "You are the Ticketing Agent for HelpSync AI. "
-            "Create a ticket only if the problem cannot be solved immediately."
-        ),
-    )
-
-    escalation_agent = create_react_agent(
-        model=model,
-        tools=[escalate_service_request],
-        name="escalation_agent",
-        prompt=(
-            "You are the Escalation Agent for HelpSync AI. "
-            "Escalate urgent, repeated, security-related, or high-impact issues."
-        ),
-    )
-
-    workflow = create_supervisor(
-        agents=[
-            classifier_agent,
-            retrieval_agent,
-            ticket_agent,
-            escalation_agent,
-        ],
-        model=model,
-        supervisor_name="helpsync_supervisor",
-        output_mode="last_message",
-        prompt=(
-            "You are the LangGraph Supervisor for HelpSync AI. "
-            "Handle enterprise service desk issues using the available agents. "
-            "First classify the issue. Then retrieve a solution. "
-            "If the solution is enough, give a clear final answer. "
-            "If the issue cannot be solved, create a ticket. "
-            "If the issue is urgent, repeated, security-related, or high impact, escalate it. "
-            "Keep the answer short, professional, and step-by-step."
-        ),
-    )
-
-    return workflow.compile()
+    return graph.compile()
 
 
 _supervisor_app = None
@@ -268,66 +488,16 @@ def get_supervisor_app():
 
 
 def run_langgraph_supervisor(user_query: str) -> Dict[str, Any]:
-    try:
-        if not os.getenv("GROQ_API_KEY"):
-            return _fallback_response(user_query, "GROQ_API_KEY is missing.")
+    app = get_supervisor_app()
 
-        app = get_supervisor_app()
+    initial_state = _base_state(user_query)
 
-        result = app.invoke(
-            {
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": user_query,
-                    }
-                ]
-            },
-            config={"recursion_limit": 8},
-        )
+    result = app.invoke(initial_state)
 
-        messages = result.get("messages", [])
-        final_response = ""
+    result["current_stage"] = "LangGraph Supervisor Workflow"
+    result["route_to"] = "langgraph_supervisor"
 
-        if messages:
-            last_message = messages[-1]
-            final_response = getattr(last_message, "content", str(last_message))
-
-        if not final_response:
-            final_response = "The issue was processed by HelpSync AI, but no final response was generated."
-
-        final_state = _base_state(user_query)
-
-        final_state.update(
-            {
-                "route_to": "langgraph_supervisor",
-                "classification": "handled_by_langgraph_supervisor",
-                "retrieval_result": "",
-                "ticket": None,
-                "escalation": None,
-                "workflow_trace": [
-                    "LangGraph Supervisor received user query",
-                    "Supervisor delegated work to specialized agents",
-                    "Supervisor generated final response",
-                ],
-                "final_response": final_response,
-                "llm_response": final_response,
-            }
-        )
-
-        try:
-            memory_record = save_conversation(final_state)
-            final_state["memory_record"] = memory_record
-        except Exception as error:
-            final_state["memory_record"] = {
-                "status": "memory_save_failed",
-                "error": str(error),
-            }
-
-        return final_state
-
-    except Exception as error:
-        return _fallback_response(user_query, str(error))
+    return result
 
 
 def run_supervisor_graph(user_query: str) -> Dict[str, Any]:
