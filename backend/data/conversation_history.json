@@ -688,5 +688,112 @@
         "final_response": "HelpSync AI has analyzed your issue.\n\nIssue:\nI cannot connect to office Wi-Fi\n\nIssue Type:\nGeneral\n\nPriority:\nLow\n\nSuggested Solution:\nRestart your router, reconnect to WiFi, forget and re-add the network, and check if airplane mode is turned off.\n\n\nWi-Fi Troubleshooting Steps:\n1. Turn Wi-Fi off and on.\n2. Check if airplane mode is disabled.\n3. Forget and reconnect to the office Wi-Fi network.\n4. Restart your laptop or mobile device.\n5. Restart the network adapter.\n6. Move closer to the router or access point.\n7. Contact IT support if the issue continues.",
         "created_at": "2026-06-28 10:47:27",
         "agent": "Memory Agent"
+    },
+    {
+        "conversation_id": "CONV-3013",
+        "user_query": "salary has not been credited yet\n",
+        "classification": {
+            "issue_type": "HR",
+            "priority": "Low",
+            "route_to": "Retrieval Agent",
+            "agent": "Classifier Agent"
+        },
+        "route_to": "langgraph_supervisor",
+        "retrieval_result": {
+            "found": true,
+            "kb_id": "KB-005",
+            "title": "Payroll or salary issue",
+            "category": "HR",
+            "solution": "Check the HR portal for payroll status. If the issue continues, contact the HR operations team.",
+            "confidence_score": 0.445,
+            "distance": 1.2450019121170044,
+            "top_matches": [
+                {
+                    "kb_id": "KB-005",
+                    "title": "Payroll or salary issue",
+                    "category": "HR",
+                    "solution": "Check the HR portal for payroll status. If the issue continues, contact the HR operations team.",
+                    "keywords": "salary, payroll, leave, attendance, employee, hr",
+                    "distance": 1.2450019121170044,
+                    "confidence_score": 0.445,
+                    "document": "Category: HR\nTitle: Payroll or salary issue\nKeywords: salary, payroll, leave, attendance, employee, hr\nSolution: Check the HR portal for payroll status. If the issue continues, contact the HR operations team.",
+                    "id": "KB-005"
+                },
+                {
+                    "kb_id": "KB-006",
+                    "title": "VPN access issue",
+                    "category": "Access",
+                    "solution": "Check your internet connection, restart the VPN client, verify credentials, and ensure MFA approval is completed.",
+                    "keywords": "vpn, access, remote, connection",
+                    "distance": 1.7302637100219727,
+                    "confidence_score": 0.366,
+                    "document": "Category: Access\nTitle: VPN access issue\nKeywords: vpn, access, remote, connection\nSolution: Check your internet connection, restart the VPN client, verify credentials, and ensure MFA approval is completed.",
+                    "id": "KB-006"
+                },
+                {
+                    "kb_id": "KB-004",
+                    "title": "Laptop hardware issue",
+                    "category": "Hardware",
+                    "solution": "Check physical connections, restart the device, update drivers, and raise a hardware support ticket if unresolved.",
+                    "keywords": "laptop, keyboard, mouse, screen, battery, printer",
+                    "distance": 1.8758089542388916,
+                    "confidence_score": 0.348,
+                    "document": "Category: Hardware\nTitle: Laptop hardware issue\nKeywords: laptop, keyboard, mouse, screen, battery, printer\nSolution: Check physical connections, restart the device, update drivers, and raise a hardware support ticket if unresolved.",
+                    "id": "KB-004"
+                }
+            ],
+            "retrieval_type": "ChromaDB Vector Search",
+            "agent": "Vector Retrieval Agent",
+            "learning_note_support": {
+                "found": true,
+                "retrieval_type": "Approved Learning Notes",
+                "agent": "Autonomous Learning Retrieval Agent",
+                "issue_type": "HR",
+                "solution": "For similar future issues, improve the response by addressing this feedback: User was not fully satisfied with the service desk response.. Provide clearer troubleshooting steps, ask one confirmation question if required, and create or escalate a ticket when the issue cannot be resolved directly.",
+                "confidence_score": 1,
+                "matched_learning_note": {
+                    "note_id": "LN-0080D5C1",
+                    "source_feedback_id": "FB-1099F018",
+                    "conversation_id": "conv3005",
+                    "priority": "High",
+                    "confidence_score": 90,
+                    "status": "applied",
+                    "rating": 2,
+                    "helpful": true,
+                    "user_comment": "",
+                    "improvement_suggestion": "",
+                    "suggested_update": "For similar future issues, improve the response by addressing this feedback: User was not fully satisfied with the service desk response.. Provide clearer troubleshooting steps, ask one confirmation question if required, and create or escalate a ticket when the issue cannot be resolved directly.",
+                    "created_at": "2026-06-09 01:10:50",
+                    "applied_at": "2026-06-09 01:11:07",
+                    "approved_id": "AL-0584C293"
+                },
+                "top_matches": [
+                    {
+                        "score": 1,
+                        "note": {
+                            "note_id": "LN-0080D5C1",
+                            "source_feedback_id": "FB-1099F018",
+                            "conversation_id": "conv3005",
+                            "priority": "High",
+                            "confidence_score": 90,
+                            "status": "applied",
+                            "rating": 2,
+                            "helpful": true,
+                            "user_comment": "",
+                            "improvement_suggestion": "",
+                            "suggested_update": "For similar future issues, improve the response by addressing this feedback: User was not fully satisfied with the service desk response.. Provide clearer troubleshooting steps, ask one confirmation question if required, and create or escalate a ticket when the issue cannot be resolved directly.",
+                            "created_at": "2026-06-09 01:10:50",
+                            "applied_at": "2026-06-09 01:11:07",
+                            "approved_id": "AL-0584C293"
+                        }
+                    }
+                ]
+            }
+        },
+        "ticket": null,
+        "escalation": null,
+        "final_response": "HelpSync AI has analyzed your issue.\n\nIssue:\nsalary has not been credited yet\n\n\nIssue Type:\nHR\n\nPriority:\nLow\n\nSuggested Solution:\nCheck the HR portal for payroll status. If the issue continues, contact the HR operations team.",
+        "created_at": "2026-06-28 11:17:09",
+        "agent": "Memory Agent"
     }
 ]
