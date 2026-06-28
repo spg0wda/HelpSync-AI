@@ -191,7 +191,38 @@ def logout_user():
 
 def render_json_card(title, data):
     with st.expander(title, expanded=False):
-        st.json(data)
+        if isinstance(data, (dict, list)):
+            st.json(data)
+        elif data is None:
+            st.info("No data available.")
+        else:
+            st.write(data)
+
+
+def display_llm_response(llm_response):
+    if isinstance(llm_response, dict):
+        response_text = (
+            llm_response.get("response")
+            or llm_response.get("message")
+            or llm_response.get("final_response")
+            or llm_response.get("answer")
+            or llm_response.get("llm_response")
+            or "No LLM response found."
+        )
+        st.success(response_text)
+        render_json_card("LLM Details", llm_response)
+
+    elif isinstance(llm_response, str):
+        if llm_response.strip():
+            st.success(llm_response)
+        else:
+            st.success("No LLM response found.")
+
+    elif llm_response is None:
+        st.info("No LLM response found.")
+
+    else:
+        st.success(str(llm_response))
 
 
 with st.sidebar:
@@ -285,6 +316,7 @@ if not st.session_state.user:
 
     st.stop()
 
+
 tab_chat, tab_dashboard, tab_tickets, tab_history, tab_reports, tab_feedback, tab_learning = st.tabs(
     [
         "💬 Chat",
@@ -330,7 +362,7 @@ with tab_chat:
 
                 memory_record = result.get("memory_record", {})
 
-                if memory_record.get("conversation_id"):
+                if isinstance(memory_record, dict) and memory_record.get("conversation_id"):
                     st.session_state.last_conversation_id = memory_record.get("conversation_id")
 
                 final_response = result.get("final_response")
@@ -343,8 +375,7 @@ with tab_chat:
 
                 if llm_response:
                     st.markdown("### 🤖 LLM Response Agent")
-                    st.success(llm_response.get("response", "No LLM response found."))
-                    render_json_card("LLM Details", llm_response)
+                    display_llm_response(llm_response)
 
                 render_json_card("Authenticated User", result.get("authenticated_user", {}))
                 render_json_card("Supervisor Decision", result.get("supervisor", {}))
@@ -559,6 +590,8 @@ with tab_feedback:
         st.json(all_feedback)
     else:
         st.error(all_feedback.get("detail", "Could not load feedback."))
+
+
 with tab_learning:
     st.markdown("### 🧠 Autonomous Learning Loop")
 
