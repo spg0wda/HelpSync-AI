@@ -89,7 +89,7 @@ def auth_register(request: RegisterRequest):
         )
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         **result
     }
 
@@ -108,7 +108,7 @@ def auth_login(request: LoginRequest):
         )
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         **result
     }
 
@@ -135,7 +135,7 @@ def auth_token(form_data: OAuth2PasswordRequestForm = Depends()):
 @router.get("/auth/me")
 def auth_me(current_user: dict = Depends(get_current_active_user)):
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "user": current_user
     }
 
@@ -145,7 +145,7 @@ def chat(request: ChatRequest):
     result = run_langgraph_workflow(request.user_query)
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         **result
     }
 
@@ -158,7 +158,7 @@ def secure_chat(
     result = run_langgraph_workflow(request.user_query)
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "authenticated_user": current_user,
         **result
     }
@@ -169,7 +169,7 @@ def history():
     conversations = get_recent_conversations(limit=10)
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "total_returned": len(conversations),
         "conversations": conversations
     }
@@ -180,7 +180,7 @@ def dashboard_stats():
     stats = get_dashboard_stats()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "dashboard": stats
     }
 
@@ -190,7 +190,7 @@ def dashboard_tickets():
     tickets = get_all_tickets()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "total_tickets": len(tickets),
         "tickets": tickets
     }
@@ -201,7 +201,7 @@ def dashboard_escalations():
     escalations = get_all_escalations()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "total_escalations": len(escalations),
         "escalations": escalations
     }
@@ -212,7 +212,7 @@ def generate_report(request: ReportRequest):
     report = generate_service_report(request.conversation_id)
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "report": report
     }
 
@@ -222,7 +222,7 @@ def reports():
     all_reports = get_all_reports()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "total_reports": len(all_reports),
         "reports": all_reports
     }
@@ -239,7 +239,7 @@ def submit_feedback(request: FeedbackRequest):
     )
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "message": "Feedback submitted successfully.",
         "feedback": feedback
     }
@@ -251,7 +251,7 @@ def feedback_records():
     summary = get_feedback_summary()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "summary": summary,
         "total_feedback": len(feedback),
         "feedback": feedback
@@ -263,7 +263,7 @@ def feedback_insights():
     insights = get_learning_insights()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "insights": insights
     }
 
@@ -273,7 +273,7 @@ def learning_summary(current_user: dict = Depends(get_current_active_user)):
     summary = get_learning_summary()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "authenticated_user": current_user,
         "summary": summary
     }
@@ -284,7 +284,7 @@ def learning_generate(current_user: dict = Depends(get_current_active_user)):
     result = generate_learning_notes_from_feedback()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "authenticated_user": current_user,
         "result": result
     }
@@ -295,7 +295,7 @@ def learning_run(current_user: dict = Depends(get_current_active_user)):
     result = run_autonomous_learning_loop()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "authenticated_user": current_user,
         "result": result
     }
@@ -306,7 +306,7 @@ def learning_notes(current_user: dict = Depends(get_current_active_user)):
     notes = get_all_learning_notes()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "authenticated_user": current_user,
         "total_notes": len(notes),
         "notes": notes
@@ -318,7 +318,7 @@ def learning_pending(current_user: dict = Depends(get_current_active_user)):
     notes = get_pending_learning_notes()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "authenticated_user": current_user,
         "total_pending": len(notes),
         "pending_notes": notes
@@ -330,7 +330,7 @@ def learning_applied(current_user: dict = Depends(get_current_active_user)):
     notes = get_applied_learning_notes()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "authenticated_user": current_user,
         "total_applied": len(notes),
         "applied_notes": notes
@@ -345,7 +345,7 @@ def learning_apply(
     result = apply_learning_note(request.note_id)
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "authenticated_user": current_user,
         "result": result
     }
@@ -356,7 +356,7 @@ def seed_vector_database():
     result = seed_knowledge_base()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "result": result
     }
 
@@ -366,7 +366,7 @@ def reset_vector_database():
     result = reset_knowledge_base()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "result": result
     }
 
@@ -376,7 +376,7 @@ def postgres_init():
     result = init_postgres_tables()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "result": result
     }
 
@@ -386,7 +386,7 @@ def postgres_status():
     result = get_postgres_status()
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "result": result
     }
 
@@ -396,7 +396,7 @@ def postgres_conversations():
     conversations = get_recent_postgres_conversations(limit=10)
 
     return {
-        "current_stage": "Phase 21 - Autonomous Learning Loop",
+        "current_stage": "LangGraph Supervisor Workflow",
         "total_returned": len(conversations),
         "conversations": conversations
     }
